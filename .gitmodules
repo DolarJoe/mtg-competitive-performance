@@ -1,0 +1,3 @@
+[submodule "MTG-API"]
+	path = MTG-API
+	url = https://github.com/Vince-maple-byte/MTG-API
