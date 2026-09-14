@@ -107,6 +107,32 @@ Two minor defects observed, both cosmetic:
 - Every `url` contains a double slash (`mtgtop8.com//event?...`) because `mainUrl` ends in `/` and `href` starts with one. Both forms return HTTP 200.
 - `POST /:pauperId` does not `await createDeck.save()`, so the 200 response can precede the writes. Re-poll `GET /pauper` rather than trusting the response timing.
 
+## Our Scraper — prefer this over the submodule
+
+`scripts/fetch-decks.js` replaces the submodule scraper for Pauper. `POST /pauper/:id` keeps only **39 of 377** available decklists because `Decks/pauper.js` collapses each archetype with `decksUrl[index][0]`. It also exposes no player, event or placing.
+
+```bash
+PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
+  node scripts/fetch-decks.js --out data/pauper-last2Months.jsonl
+```
+
+Verified run: **377 decklists across 39 archetypes in 242s**, 9373 card lines, mainboard 60 for 358 lists (61 for 18, one outlier at 75/0), sideboard 15 for 376, `player`/`event`/`eventId`/`placing` populated on all 377. Writes JSONL incrementally, so an interrupted run keeps partial output.
+
+Flags: `--view` (any `urlMap` key), `--out`, `--max-per-arch`, `--max-pages`, `--only`, `--limit-archetypes`, `--delay`, `--dry`.
+
+### mtgtop8 markup facts (verified from live HTML)
+
+These selectors are load-bearing and are *not* what the upstream scraper guesses at:
+
+- Card rows are `.deck_line`. Their **`id` prefix encodes the section**: `md*` = main deck, `sb*` = sideboard. Use this, not heading text — there is no `.deck_title_line` element on current pages, which is why heading-based splitting silently puts all 75 cards in the mainboard.
+- `.O14` divs are type group headings ("19 LANDS", "15 CREATURES", "26 INSTANTS and SORC.", "SIDEBOARD") and precede their cards in DOM order.
+- `a.player_big` is the deck's own player. Plain `a.player` links are the *other* decks in the same event, so a naive `querySelector` grabs the wrong player.
+- `.event_title` appears twice: first the tournament name, later `#<place> <deck variant> - `.
+- `document.title` is `"<Variant> - <Player> @ mtgtop8.com"`.
+- Archetype pages cap at 20 decklists and `&page=N` did **not** yield more — 377 appears to be the whole live 2-month field. Re-check if you need deeper history.
+
+Related scripts: `scripts/probe-depth.js` (available lists per archetype), `scripts/scrape-pauper.js` (submodule scraper, no server/DB).
+
 ## Environment Gotchas
 
 - Docker socket is not user-accessible on this machine (`dj` is not in group `docker`, and `sudo` requires a password). Mongo must be started with `sudo docker ...` by the operator.
