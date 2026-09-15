@@ -83,7 +83,7 @@ That last one is benign when every link on the page was already collected under 
 
 `docs/index.html` is a single self-contained file — no CDN, no `fetch`, no build step, opens over `file://`. `node scripts/build-site.js` regenerates it; commit the output or Pages serves the stale copy.
 
-**Live at <https://dolarjoe.github.io/mtg-competititve-performance/>** — Settings → Pages → *Deploy from a branch* → `main`, folder **`/docs`**.
+**Live at <https://dolarjoe.github.io/mtg-competitive-performance/>** — Settings → Pages → *Deploy from a branch* → `main`, folder **`/docs`**. Stable entry point: <https://dolarjoe.github.io/> (a clickthrough), cloned alongside this repo at `../DolarJoe.github.io`.
 
 Two traps in that setup, both learned the hard way:
 
@@ -92,7 +92,7 @@ Two traps in that setup, both learned the hard way:
 
 `curl` cannot tell you the page works — it returns the bytes either way, and the table is built by inline JS. Verify by rendering: load the URL in a browser, or headless Chromium and count `#tb tr` (728 as of 2026-09-15, with meta "864 cards across 641 decklists"). The only 404 on the page is `favicon.ico`, which the HTML never references — browsers ask regardless.
 
-Note the repo slug (`mtg-competititve-performance`, sic) differs from this directory name (`competitive_ranking_mtg`). Do not infer the Pages URL from the folder.
+The Pages URL **is** the repo slug, so renaming the repo moves the site and the old URL 404s — project site URLs are the documented exception to GitHub's rename redirects (`git push` and `github.com/...` do redirect; `*.github.io` does not). Renamed 2026-09-15 from the misspelled `mtg-competititve-performance`; that Pages URL is dead, the repo URL 301s. Do not rename again without updating the homepage links. GitHub's own workaround, if the URL ever needs to stop being slug-derived, is a custom domain.
 
 ## Layout
 
