@@ -5,7 +5,7 @@
 Pauper metagame data pipeline. Three stages, all plain Node with no build step:
 
 ```
-mtgtop8.com  --fetch-decks.js-->  data/*.jsonl  --build-site.js-->  site/index.html
+mtgtop8.com  --fetch-decks.js-->  data/*.jsonl  --build-site.js-->  docs/index.html
                                   --peek.js---->  terminal views
 ```
 
@@ -32,7 +32,7 @@ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --dry
 
 PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --view last2Months
 node scripts/peek.js archetypes | cards [--arch X] | deck <n|name> | events | raw <n>
-node scripts/build-site.js            # data/pauper-last2Weeks.jsonl -> site/index.html
+node scripts/build-site.js            # data/pauper-last2Weeks.jsonl -> docs/index.html
 ```
 
 A full `last2Weeks` pull is 641 lists in ~7 min; `last2Months` (2,967) is ~32 min. Single-threaded by design — mtgtop8 is a small site.
@@ -81,9 +81,16 @@ That last one is benign when every link on the page was already collected under 
 
 ## Deployment
 
-`site/index.html` is a single self-contained file — no CDN, no build step, opens over `file://`. Commit it; `scripts/build-site.js` regenerates it from the JSONL.
+`docs/index.html` is a single self-contained file — no CDN, no `fetch`, no build step, opens over `file://`. `node scripts/build-site.js` regenerates it; commit the output or Pages serves the stale copy.
 
-**GitHub Pages is not enabled on this repo.** As of 2026-09-15 every `*.github.io` path 404s while `raw.githubusercontent.com` serves the same file, so the committed site is not reachable as a website. To publish: repo Settings → Pages → Source *Deploy from a branch* → branch `main`, folder `/site`. Then it serves at `https://dolarjoe.github.io/mtg-competititve-performance/`.
+**Live at <https://dolarjoe.github.io/mtg-competititve-performance/>** — Settings → Pages → *Deploy from a branch* → `main`, folder **`/docs`**.
+
+Two traps in that setup, both learned the hard way:
+
+- The chosen folder is published at the **site root**. The page is at `/`, **not** `/docs/index.html` and not `/site/...`. Those 404 — which looks exactly like "live but empty".
+- Pages only serves `/docs`. `build-site.js` defaults there now, but a `--out` elsewhere publishes nothing while the local build looks fine.
+
+`curl` cannot tell you the page works — it returns the bytes either way, and the table is built by inline JS. Verify by rendering: load the URL in a browser, or headless Chromium and count `#tb tr` (728 as of 2026-09-15, with meta "864 cards across 641 decklists"). The only 404 on the page is `favicon.ico`, which the HTML never references — browsers ask regardless.
 
 Note the repo slug (`mtg-competititve-performance`, sic) differs from this directory name (`competitive_ranking_mtg`). Do not infer the Pages URL from the folder.
 

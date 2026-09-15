@@ -2,9 +2,13 @@
 /*
  * build-site.js — render the decklist JSONL into a single self-contained
  * HTML card-frequency table. No server, no build step, no CDN: open
- * site/index.html directly.
+ * docs/index.html directly.
  *
- *   node scripts/build-site.js [--file data/pauper-last2Weeks.jsonl] [--out site/index.html]
+ *   node scripts/build-site.js [--file data/pauper-last2Weeks.jsonl] [--out docs/index.html]
+ *
+ * Default output is docs/index.html because that is what GitHub Pages serves
+ * for this repo (Settings → Pages → branch main, folder /docs, published at the
+ * site root, NOT at /docs/). Building anywhere else publishes nothing.
  */
 
 const fs = require('fs');
@@ -17,7 +21,7 @@ const flag = (name, dflt) => {
 };
 
 const file = flag('file', 'data/pauper-last2Weeks.jsonl');
-const out = flag('out', 'site/index.html');
+const out = flag('out', 'docs/index.html');
 
 const BASICS = new Set(['Plains', 'Island', 'Swamp', 'Mountain', 'Forest',
     'Snow-Covered Plains', 'Snow-Covered Island', 'Snow-Covered Swamp',
