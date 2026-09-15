@@ -4,20 +4,20 @@
  *
  * Independent of the MTG-API submodule's scraper. It exists because
  * MTG-API/backend/Decks/pauper.js collapses each archetype to one decklist
- * (decksUrl[index][0]), keeping 39 of 377 available Pauper lists. This script
- * keeps them all, and paginates.
+ * (decksUrl[index][0]), keeping 39 of 641 available Pauper lists. This script
+ * keeps them all, and paginates via the site's POST nav form.
  *
  * Output: newline-delimited JSON, one decklist per line, written incrementally
  * so an interrupted run keeps what it fetched.
  *
  *   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js
- *   ... node scripts/fetch-decks.js --view allPauperDecks --max-lists 3000
+ *   ... node scripts/fetch-decks.js --view allPauperDecks --max-per-arch 20
  *
  * Flags
- *   --view NAME          last2Months (default) | liveTournaments | all20XXDecks | allPauperDecks ...
+ *   --view NAME          last2Weeks (default) | last2Months | all20XXDecks | allPauperDecks ...
  *   --out PATH           output .jsonl (default data/pauper-<view>.jsonl)
  *   --max-per-arch N     cap decklists per archetype (default: no cap)
- *   --max-pages N        cap archetype pages walked (default 3)
+ *   --max-pages N        cap archetype pages walked (default 40, a safety bound)
  *   --only NAME          substring filter on archetype name, repeatable
  *   --limit-archetypes N debug: first N archetypes only
  *   --delay MS           polite gap between requests (default 300)
@@ -32,20 +32,33 @@ const puppeteer = require('../MTG-API/backend/node_modules/puppeteer');
 
 const BASE = 'https://www.mtgtop8.com/';
 
-// Verified against MTG-API/backend/Decks/pauper.js urlMap.
+/* Labels are taken from the "METAGAME BREAKDOWN" header mtgtop8 prints on each
+ * view, not from the submodule's urlMap -- that map calls meta=299 "last2Months"
+ * while the site itself labels it "Last 2 Weeks". Decklist totals below are the
+ * "NNN decks" figure each page states, as measured 2026-09-15.
+ *
+ * The yearly views partition the whole set: they sum to 76,284 against
+ * allPauperDecks' 76,348.
+ */
 const VIEWS = {
-    last2Months: 'format?f=PAU',
-    last4Months: 'format?f=PAU&meta=127&a=',
-    liveTournaments: 'format?f=PAU&meta=185&a=',
-    all2023Decks: 'format?f=PAU&meta=251&a=',
-    all2022Decks: 'format?f=PAU&meta=239&a=',
-    all2021Decks: 'format?f=PAU&meta=224&a=',
-    all2020Decks: 'format?f=PAU&meta=223&a=',
-    all2019Decks: 'format?f=PAU&meta=186&a=',
-    all2018Decks: 'format?f=PAU&meta=170&a=',
-    all2017Decks: 'format?f=PAU&meta=169&a=',
-    all2016Decks: 'format?f=PAU&meta=168&a=',
-    allPauperDecks: 'format?f=PAU&meta=110&a=',
+    last5Days: 'format?f=PAU&meta=348&a=',      //   153 decks
+    last2Weeks: 'format?f=PAU&meta=299&a=',     //   641 decks (was mislabelled last2Months)
+    last2Months: 'format?f=PAU&meta=145&a=',    // 2,967 decks
+    lastMajorEvents: 'format?f=PAU&meta=325&a=',//    89 decks
+    last4Months: 'format?f=PAU&meta=127&a=',    // 7,210 decks
+    liveTournaments: 'format?f=PAU&meta=185&a=',// 2,729 decks
+    all2026Decks: 'format?f=PAU&meta=342&a=',   // 16,706 decks
+    all2025Decks: 'format?f=PAU&meta=311&a=',   // 18,742 decks
+    all2024Decks: 'format?f=PAU&meta=282&a=',   // 14,370 decks
+    all2023Decks: 'format?f=PAU&meta=251&a=',   //  8,889 decks
+    all2022Decks: 'format?f=PAU&meta=239&a=',   //  4,580 decks
+    all2021Decks: 'format?f=PAU&meta=224&a=',   //  4,303 decks
+    all2020Decks: 'format?f=PAU&meta=223&a=',   //  1,548 decks
+    all2019Decks: 'format?f=PAU&meta=186&a=',   //  1,516 decks
+    all2018Decks: 'format?f=PAU&meta=170&a=',   //  1,263 decks
+    all2017Decks: 'format?f=PAU&meta=169&a=',   //  2,352 decks
+    all2016Decks: 'format?f=PAU&meta=168&a=',   //  2,015 decks
+    allPauperDecks: 'format?f=PAU&meta=110&a=', // 76,348 decks
 };
 
 function parseArgs(argv) {
@@ -56,11 +69,12 @@ function parseArgs(argv) {
         if (key === 'only') { opts.only.push(argv[++i]); continue; }
         opts[key] = argv[++i];
     }
-    opts.view = opts.view || 'last2Months';
+    opts.view = opts.view || 'last2Weeks';
     if (!VIEWS[opts.view]) {
         throw new Error(`unknown --view "${opts.view}". known: ${Object.keys(VIEWS).join(', ')}`);
     }
-    opts.maxPages = Number(opts.maxPages ?? 3);
+    // Safety bound only. Real termination is "no fresh links" or a partial page.
+    opts.maxPages = Number(opts.maxPages ?? 40);
     opts.delay = Number(opts.delay ?? 300);
     opts.maxPerArch = opts.maxPerArch === undefined ? Infinity : Number(opts.maxPerArch);
     opts.out = opts.out || path.join('data', `pauper-${opts.view}.jsonl`);
@@ -145,9 +159,15 @@ async function readDeck(page) {
 async function main() {
     const opts = parseArgs(process.argv.slice(2));
 
-    if (!fs.existsSync(path.dirname(opts.out))) fs.mkdirSync(path.dirname(opts.out), { recursive: true });
-    fs.writeFileSync(opts.out, '');
-    const stream = fs.createWriteStream(opts.out, { flags: 'a' });
+    /* A --dry run must not touch the output file. Truncating up front is how a
+     * stray `require()` of this file once zeroed a committed dataset. */
+    let stream;
+    if (opts.dry) {
+        stream = { write() {}, end() {} };
+    } else {
+        if (!fs.existsSync(path.dirname(opts.out))) fs.mkdirSync(path.dirname(opts.out), { recursive: true });
+        stream = fs.createWriteStream(opts.out, { flags: 'w' });
+    }
 
     const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
@@ -164,9 +184,25 @@ async function main() {
         let done = 0;
         for (const arch of archetypes) {
             const links = [];
+            /* mtgtop8 paginates by POST, not by link. The nav bar renders
+             * <div class=Nav_norm onclick=PageSubmit_arch(n)> with no href, and
+             * that function sets a hidden `current_page` field then submits
+             * form[name=nav_form]. Every GET form is ignored — &page=2 and
+             * &cp=2 both silently re-serve page 1, whose links are already in
+             * `seen`, so the old loop broke on page 1 for every archetype. */
             for (let p = 1; p <= opts.maxPages; p++) {
-                const url = p === 1 ? arch.url : arch.url.replace(/([?&])page=\d+/, '$1') + `&page=${p}`;
-                await page.goto(url, { waitUntil: 'domcontentloaded' });
+                if (p === 1) {
+                    await page.goto(arch.url, { waitUntil: 'domcontentloaded' });
+                } else {
+                    try {
+                        await Promise.all([
+                            page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30000 }),
+                            page.evaluate((n) => PageSubmit_arch(n), p),
+                        ]);
+                    } catch {
+                        break; // no nav form or no further pages
+                    }
+                }
                 await sleep(opts.delay);
                 const found = await readDeckLinks(page);
                 const fresh = found.filter((u) => !seen.has(u) && !links.includes(u));
@@ -218,4 +254,7 @@ async function main() {
     }
 }
 
-main().catch((e) => { console.error('FAILED:', e.message); process.exit(1); });
+/* Guarded: importing this file must never scrape, write, or truncate anything. */
+if (require.main === module) {
+    main().catch((e) => { console.error('FAILED:', e.message); process.exit(1); });
+}

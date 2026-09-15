@@ -4,7 +4,7 @@
  * HTML card-frequency table. No server, no build step, no CDN: open
  * site/index.html directly.
  *
- *   node scripts/build-site.js [--file data/pauper-last2Months.jsonl] [--out site/index.html]
+ *   node scripts/build-site.js [--file data/pauper-last2Weeks.jsonl] [--out site/index.html]
  */
 
 const fs = require('fs');
@@ -16,7 +16,7 @@ const flag = (name, dflt) => {
     return i === -1 ? dflt : argv[i + 1];
 };
 
-const file = flag('file', 'data/pauper-last2Months.jsonl');
+const file = flag('file', 'data/pauper-last2Weeks.jsonl');
 const out = flag('out', 'site/index.html');
 
 const BASICS = new Set(['Plains', 'Island', 'Swamp', 'Mountain', 'Forest',
