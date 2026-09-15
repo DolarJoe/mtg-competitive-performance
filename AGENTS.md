@@ -55,10 +55,29 @@ Do not "fix" these in the scraper. `section` comes from the `md`/`sb` id prefixe
 There is no test suite. Use these checks instead — each has caught a real defect:
 
 1. **Total vs the site.** `--dry` total must equal the "NNN decks" figure printed on the view's format page. 641 matched for `last2Weeks`.
-2. **Per archetype vs metagame share.** Multiply each archetype's percentage by that total; small archetypes should match within ±3 and **nothing should sit at exactly 20** — a pile at 20 means pagination died.
+2. **Per archetype vs metagame share.** Multiply each archetype's percentage by that total; counts should agree within ±3. A shortfall is the defect — chase it whatever number it lands on.
 3. **Deck sizes vs `O14` group headings**, for any list that is not 60/15.
 
 Check 2 is what exposed a run that silently returned 377 of 641 lists and reported no error.
+
+#### Reading a count of 20
+
+**Exactly 20 is suspicious, not wrong.** 20 is mtgtop8's page size, so an archetype that really has 20 lists correctly returns 20. Judge it against the expected count from check 2, not against the page size:
+
+- expected > 20 but scraped == 20 → the page walk died after page 1. Defect.
+- several archetypes at exactly 20 at once → near-certain defect. Truncation produces a pile; a real metagame produces one or two.
+- expected ≈ 20 → fine. Small views legitimately have many archetypes under 20.
+
+The number is only a proxy; the walk's exit reason is the real signal, and it is not logged. Exits are (`fetch-decks.js:194-211`):
+
+| exit | meaning | verdict |
+| --- | --- | --- |
+| navigation threw on page *n* | nav offered no further pages | clean |
+| a partial page (< 20 links) | last page | clean |
+| `--max-per-arch` / `--max-pages` | deliberate cap, or the 40-page safety bound bit | check which |
+| no new links on a page | **ambiguous** | investigate |
+
+That last one is benign when every link on the page was already collected under a different archetype — `seen` is global across archetypes (`fetch-decks.js:174`), and mtgtop8 cross-lists some decks — and malignant when navigation silently re-served page 1. To settle a specific count: `--only "<archetype>" --dry` and compare it to the expected figure from check 2.
 
 ## Deployment
 
