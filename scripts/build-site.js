@@ -211,20 +211,15 @@ const html = `<!DOCTYPE html>
   @media (max-width:430px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
-          border:1px solid var(--line); border-radius:10px; background:#0e1013;
+          border:1px solid var(--line); border-radius:12px; background:#0e1013;
           text-decoration:none; overflow:hidden; }
   .tile:hover { border-color:var(--hi); }
   /* The tile carries no padding — the art is flush with the border and the
    * caption owns its spacing via margin — so overflow:hidden is what rounds the
-   * top corners. The image's own 10px squares off its bottom corners, where
+   * top corners. The image's own 12px squares off its bottom corners, where
    * nothing clips them. No background behind the art: the cream plate only ever
    * showed through the rounded corners and during the load. */
-  .tile img { display:block; width:100%; height:auto; border-radius:10px; }
-  .tile .rank { position:absolute; top:6px; left:6px; background:rgba(10,12,15,.82); color:var(--hi);
-          border-radius:4px; padding:0 5px; font-size:11px; font-variant-numeric:tabular-nums; }
-  .tile .occ { position:absolute; top:6px; right:6px; background:rgba(10,12,15,.82);
-          border-radius:4px; padding:0 5px; font-size:11px; color:var(--fg);
-          font-variant-numeric:tabular-nums; }
+  .tile img { display:block; width:100%; height:auto; border-radius:12px; }
   .cap { margin:8px 8px 6px; }
   .nm { font-size:13px; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2;
         -webkit-box-orient:vertical; overflow:hidden; min-height:2.5em; }
@@ -301,7 +296,7 @@ function esc(s) {
 
 /* Only the 40 cards on this page reach the DOM, so at most 40 images are ever
  * requested; loading=lazy trims that to the ones actually scrolled into view. */
-function tile(c, rank, max) {
+function tile(c, max) {
   var occ = value(c, 'o');
   var pct = (100 * value(c, 'p')).toFixed(1);
   var w = Math.max(2, Math.round(100 * occ / max));
@@ -311,9 +306,8 @@ function tile(c, rank, max) {
   var inner = c.i
     ? '<img src="' + esc(c.i) + '" alt="' + esc(c.n) + '" loading="lazy" decoding="async">'
     : '<div class="noimg">' + esc(c.n) + '<br><span style="font-size:11px">no image cached</span></div>';
-  var body = '<span class="rank">' + rank + '</span>'
-    + '<span class="occ">' + occ.toLocaleString() + '</span>'
-    + inner
+  /* No rank or count badge over the art — the caption already carries both. */
+  var body = inner
     + '<div class="cap"><div class="nm">' + esc(c.n) + '</div>'
     + '<div class="stat">' + pct + '% \u00b7 ' + esc(qty) + ' \u00b7 ' + c.na + ' archetypes</div>'
     + '<div class="meter" style="width:' + w + '%"></div></div>';
@@ -368,7 +362,7 @@ function render() {
   var page = Math.min(Math.max(1, pageFromHash()), pages);
   var max = Math.max(1, ...rows.map(function (c) { return value(c, 'o'); }));
   var from = (page - 1) * DATA.per, slice = rows.slice(from, from + DATA.per);
-  el('grid').innerHTML = slice.map(function (c, i) { return tile(c, from + i + 1, max); }).join('');
+  el('grid').innerHTML = slice.map(function (c) { return tile(c, max); }).join('');
   renderPager(pages, page);
   el('count').textContent = rows.length.toLocaleString() + ' cards \u00b7 page ' + page + ' of ' + pages
     + ' \u00b7 showing ' + (rows.length ? from + 1 : 0) + '\u2013' + (from + slice.length);
