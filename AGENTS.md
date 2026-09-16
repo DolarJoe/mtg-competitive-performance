@@ -34,9 +34,12 @@ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --dry
 PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --view last2Months
 node scripts/peek.js archetypes | cards [--arch X] | deck <n|name> | events | raw <n>
 node scripts/build-site.js            # -> docs/last-2-weeks.html, and rewrites docs/index.html
+node scripts/build-site.js --file data/pauper-all2016Decks.jsonl   # -> docs/all-2016-decks.html
 ```
 
-A full `last2Weeks` pull is 641 lists in ~7 min; `last2Months` (2,967) is ~32 min. Single-threaded by design — mtgtop8 is a small site.
+`build-site.js` defaults `--file` to `data/pauper-last2Weeks.jsonl`, so a build without `--file` silently rebuilds the 2-week page — that is how a "build the 2016 window" step produced no 2016 page and an index still listing one row. The output name comes from the data's `view` field, never from `--file`.
+
+A full `last2Weeks` pull is 641 lists in ~7 min; `all2016Decks` (2,012) took 24 min; `last2Months` (2,967) is ~32 min. Single-threaded by design — mtgtop8 is a small site.
 
 ## Data Files
 
@@ -56,18 +59,19 @@ Do not "fix" these in the scraper. `section` comes from the `md`/`sb` id prefixe
 There is no test suite. Use these checks instead — each has caught a real defect:
 
 1. **Total vs the site.** `--dry` total must equal the "NNN decks" figure printed on the view's format page. 641 matched for `last2Weeks`.
-2. **Per archetype vs metagame share.** Multiply each archetype's percentage by that total; counts should agree within ±3. A shortfall is the defect — chase it whatever number it lands on.
-3. **Deck sizes vs `O14` group headings**, for any list that is not 60/15.
+2. **Per archetype vs its own nav bar.** Strongest check available, and it is ground truth rather than an estimate: on an archetype page, `[...document.querySelectorAll('[onclick^="PageSubmit_arch"]')].map(e => +e.textContent.trim())` lists *every page that exists*. Max page × 20 bounds the archetype's true count, and POSTing to max+1 returns a page with zero decklist links. The percentage arithmetic below is the weaker fallback.
+3. **Per archetype vs metagame share.** Multiply each archetype's percentage by that total; counts should agree within the rounding band, `total × 0.005` lists (±10 at 2,015 decks). A shortfall outside that band is the defect — chase it whatever number it lands on.
+4. **Deck sizes vs `O14` group headings**, for any list that is not 60/15.
 
 Check 2 is what exposed a run that silently returned 377 of 641 lists and reported no error.
 
 #### Reading a count of 20
 
-**Exactly 20 is suspicious, not wrong.** 20 is mtgtop8's page size, so an archetype that really has 20 lists correctly returns 20. Judge it against the expected count from check 2, not against the page size:
+**A count that is an exact multiple of 20 is suspicious, not wrong** — 20 is mtgtop8's page size, so an archetype with genuinely 20 lists returns 20. Multiples of 20 are the interesting ones because a truncated walk always lands on one: the loop stops on a partial page, so a walk that died has a full page at the end. Judge against the archetype's own nav (check 2), not the page size:
 
-- expected > 20 but scraped == 20 → the page walk died after page 1. Defect.
-- several archetypes at exactly 20 at once → near-certain defect. Truncation produces a pile; a real metagame produces one or two.
-- expected ≈ 20 → fine. Small views legitimately have many archetypes under 20.
+- nav offers more pages than the walk visited → the walk died. Defect, unambiguously.
+- scraped == 20 while expected is well above it, or several archetypes land on 20 at once → near-certain defect. Truncation produces a pile; a real metagame produces one or two.
+- nav stops at the last page the walk visited → fine, even when the count is 100 or 200. `UR Aggro` came back at exactly 100 in the 2016 pull and was checked this way: its nav lists pages 1–5 only, and POSTing to page 6 returns a page with zero decklist links. Genuine 100, five full pages.
 
 The number is only a proxy; the walk's exit reason is the real signal, and it is not logged. Exits are (`fetch-decks.js:194-211`):
 
@@ -234,6 +238,13 @@ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium \
 
 Verified run: **641 decklists across 39 archetypes in 410s** — matching the 641 total mtgtop8 states for that view — 15,486 card lines, 0 fetch errors, 641 distinct `deckUrl`. Mainboard 60 for 613 lists, 61 for 27, one outlier at 75/0; sideboard 15 except 2 lists. `player`/`event`/`eventId`/`placing` populated on all 641. Writes JSONL incrementally, so an interrupted run keeps partial output.
 
+Verified run of the **2016 view** (`--view all2016Decks` → `data/pauper-all2016Decks.jsonl`, 4.4 MB): **2,012 decklists across 28 archetypes in 1,437s**, 49,546 card lines, 0 errors, 2,012 distinct `deckUrl`, every `player`/`event`/`placing` populated. Sizes: 1,945 at 60/15, then 60/0 ×38, 61/15 ×22, 74/0 ×2, **60/16 ×2**, 73/0, 66/15, 62/15 — all 67 of those re-checked against `O14` totals, 67/67 agreement. The `60/16` and `66/15` are illegal in Pauper (sideboard is 0 or exactly 15); mtgtop8 hosts whatever people post, and the parser reports it faithfully.
+
+Two things that run did not reconcile, both understood rather than fixed:
+
+- **2,012 reachable against a "2015 decks" headline** — a 0.15% gap. Not pagination (`cp=` ignored, format page renders no nav links), not hidden archetypes (`cp=`, `cp=2`, `cp=3` return identical 28-id sets), not cross-archetype dedupe (an undeduped link walk counted 2,012 listings, 2,012 unique, 0 decks under more than one archetype). The headline is view-level and is printed even on a single-archetype page, so it is the site's own tally, not a sum of what the grid links.
+- **Only 17 of 28 archetypes show a percentage.** The other 11 — all between 1 and 11 lists, consistent with rounding under 1% — render an empty cell, so check 3 covers 17 archetypes and no more. The nav-bar check (check 2) covers all 28, which is the main reason it replaced the percentage arithmetic.
+
 Importing this file is inert — `main()` is behind a `require.main === module` guard. Before that guard, a stray `require()` truncated a committed dataset to zero bytes because `main()` opened the output file before doing anything else. Keep that guard.
 
 Flags: `--view` (any `urlMap` key), `--out`, `--max-per-arch`, `--max-pages`, `--only`, `--limit-archetypes`, `--delay`, `--dry`.
@@ -257,7 +268,10 @@ These selectors are load-bearing and are *not* what the upstream scraper guesses
   ```
 
   Pages hold 20 decklists, so any archetype with >20 needs this. Getting it wrong is invisible: the duplicate links are filtered against `seen`, `fresh.length` is 0, and the loop breaks with a plausible-looking result. That is how a run produced 377 of 641 lists and reported no error.
-- `cp=N` *does* paginate the **format** page (it lists more archetypes), which is what made `cp=` look like the answer for archetype pages too. It is not.
+- **Decklist links carry `&d=`; bare `event?e=NNNNN&f=PAU` links are event overviews.** Selecting on `a[href*="event?e="]` grabs both and roughly doubles the count — in one run of a dedupe probe that produced 4,024 "listings" where there are 2,012. Filter on `&d=`. `fetch-decks.js` already does; hand-written probes must too.
+- **The "`NNN` decks" figure is view-level, not per-archetype.** `meta=168` prints "2015 decks" on the format page *and* on every single-archetype page inside that view, including one holding 307 lists. Use it for check 1 only, never as an archetype's expected count.
+- `cp=N` *does* paginate the **format** page in principle, but on `meta=168` it is ignored: `cp=`, `cp=2` and `cp=3` return byte-identical archetype sets (28 ids, same hash) and render no `PageSubmit` nav links. A format page with no nav links shows all its archetypes on one page.
+- The `nav_form` / `PageSubmit_arch` strings appear in the **format** page's inline `<script>` even though that page has no such form. Grepping for the identifier proves nothing; look for `<form name=nav_form>` and `onclick=PageSubmit_arch(` in the markup.
 
 Related scripts: `scripts/probe-depth.js` (available lists per archetype), `scripts/scrape-pauper.js` (submodule scraper, no server/DB).
 
