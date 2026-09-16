@@ -211,16 +211,15 @@ const html = `<!DOCTYPE html>
   @media (max-width:430px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
-          border:1px solid var(--line); border-radius:9px; background:#0e1013;
+          border:1px solid var(--line); border-radius:10px; background:#0e1013;
           text-decoration:none; overflow:hidden; }
   .tile:hover { border-color:var(--hi); }
   /* The tile carries no padding — the art is flush with the border and the
    * caption owns its spacing via margin — so overflow:hidden is what rounds the
-   * top corners. The image's own 9px also squares off its bottom corners, where
-   * nothing clips them. Both curves are 9px by request; they are not concentric
-   * (nested would want outer = inner + inset) because there is no inset. */
-  .tile img { display:block; width:100%; height:auto; background:#f4f1ea;
-              border-radius:9px; }
+   * top corners. The image's own 10px squares off its bottom corners, where
+   * nothing clips them. No background behind the art: the cream plate only ever
+   * showed through the rounded corners and during the load. */
+  .tile img { display:block; width:100%; height:auto; border-radius:10px; }
   .tile .rank { position:absolute; top:6px; left:6px; background:rgba(10,12,15,.82); color:var(--hi);
           border-radius:4px; padding:0 5px; font-size:11px; font-variant-numeric:tabular-nums; }
   .tile .occ { position:absolute; top:6px; right:6px; background:rgba(10,12,15,.82);
