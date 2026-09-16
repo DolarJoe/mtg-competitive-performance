@@ -36,6 +36,7 @@ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --view l
 node scripts/peek.js archetypes | cards [--arch X] | deck <n|name> | events | raw <n>
 node scripts/build-site.js            # -> docs/last-2-weeks.html, and rewrites docs/index.html
 node scripts/build-site.js --file data/pauper-all2016Decks.jsonl   # -> docs/all-2016-decks.html
+node scripts/build-site.js --per 40 --cache scryfall_api/cache/cards.jsonl   # both are the defaults
 ```
 
 `build-site.js` defaults `--file` to `data/pauper-last2Weeks.jsonl`, so a build without `--file` silently rebuilds the 2-week page — that is how a "build the 2016 window" step produced no 2016 page and an index still listing one row. The output name comes from the data's `view` field, never from `--file`.
@@ -48,12 +49,18 @@ A full `last2Weeks` pull is 641 lists in ~7 min; `all2016Decks` (2,012) took 24 
 
 ### Deck size anomalies are real, not parser bugs
 
-29 of 641 lists are not 60/15. All 29 were checked against the site's own `O14` group headings ("19 LANDS", "15 CREATURES", "27 INSTANTS and SORC.") and **every one agrees** — zero disagreements:
+**Deck size is never a correctness signal.** mtgtop8 hosts whatever people submit, so an odd total is data, not a defect.
+
+29 of 641 lists (`last2Weeks`) and 67 of 2,012 (`all2016Decks`) are not 60/15. All of them were checked against the site's own `O14` group headings ("19 LANDS", "15 CREATURES", "27 INSTANTS and SORC.") and **every one agrees** — zero disagreements:
 
 - **27 lists at 61/15** — genuine 61-card main decks. Legal, and spread across 16 of the 39 archetypes (1–3 each: Burn 3, Golgari/Jund Garden 3, then Affinity, Elves, Urzatron, Dimir Control, Mono Blue Terror, Other-Control, Turbo Fog at 2) — so it is individual players opting into a 61st card, not an archetype-specific pattern.
 - **1 list at 60/0, 1 at 75/0** — those pages carry **no `SIDEBOARD` heading at all**; the poster submitted no sideboard. The 75-card one is a single lumped list as entered.
 
-Do not "fix" these in the scraper. `section` comes from the `md`/`sb` id prefixes and matches the source exactly. If you see a new size class, compare against the `O14` totals before assuming a scrape defect.
+Do not "fix" these in the scraper. `section` comes from the `md`/`sb` id prefixes and matches the source exactly.
+
+**Cross-check the `O14` totals only when `mainboardCount + sideboardCount` is below 60** — that is the one shape a truncated card list makes. Anything at or above 60 total is stored silently: `60/0` is no sideboard, `61/15` and `66/15` are oversized mains, `74/0` and `75/0` are lumped lists. `fetch-decks.js` warns on a sub-60 total and writes the row regardless.
+
+No list in either window is below 60 total (0 of 2,012 and 0 of 641), so this check is currently vacuous.
 
 ## Verification
 
@@ -62,7 +69,7 @@ There is no test suite. Use these checks instead — each has caught a real defe
 1. **Total vs the site.** `--dry` total must equal the "NNN decks" figure printed on the view's format page. 641 matched for `last2Weeks`.
 2. **Per archetype vs its own nav bar.** Strongest check available, and it is ground truth rather than an estimate: on an archetype page, `[...document.querySelectorAll('[onclick^="PageSubmit_arch"]')].map(e => +e.textContent.trim())` lists *every page that exists*. Max page × 20 bounds the archetype's true count, and POSTing to max+1 returns a page with zero decklist links. The percentage arithmetic below is the weaker fallback.
 3. **Per archetype vs metagame share.** Multiply each archetype's percentage by that total; counts should agree within the rounding band, `total × 0.005` lists (±10 at 2,015 decks). A shortfall outside that band is the defect — chase it whatever number it lands on.
-4. **Deck sizes vs `O14` group headings**, for any list that is not 60/15.
+4. **Deck sizes vs `O14` group headings** — only for a list whose `mainboardCount + sideboardCount` is **below 60**. Above 60 total, do not check; odd sizes are what the site hosts. 0 of 2,653 rows qualify as of 2026-09-16.
 
 Check 2 is what exposed a run that silently returned 377 of 641 lists and reported no error.
 
@@ -87,9 +94,24 @@ That last one is benign when every link on the page was already collected under 
 
 ## Deployment
 
-Every page under `docs/` is self-contained — no CDN, no `fetch`, opens over `file://`. Commit the output; Pages serves whatever was last committed.
+Pages under `docs/` carry their own markup, CSS and data — no bundler, no `fetch`, no framework, no JS of ours on a CDN. **Card images are the one exception:** tiles hot-link `cards.scryfall.io`, so a rendered page needs network access (the page still *opens* over `file://`, and it does there, but the pictures only appear online). Commit the output; Pages serves whatever was last committed.
 
 `node scripts/build-site.js` writes **one page per view**, named from the JSONL's own `view` field: `pauper-last2Weeks.jsonl` → `docs/last-2-weeks.html`, heading `Pauper card occurrences — Last 2 Weeks`. Each page states its window and its scrape date, because these are mtgtop8's *rolling* views — "Last 2 Weeks" means the fortnight before that scrape, not a calendar range. Then it rewrites `docs/index.html` as a picker, listing whatever window pages exist on disk, read back from each page's own embedded `DATA` so the index cannot advertise a page that isn't there.
+
+### The page is a card-image grid, not a table
+
+4 tiles across × 10 rows = **40 cards per page** (`--per` to change it), ordered exactly as the old frequency table ordered rows: by occurrences in the selected section, descending, basics hidden by default. Sort keys, the mainboard/sideboard/both cycle and the name filter all survived; the `<th>` click handlers became buttons. Paging is client-side over the one embedded `DATA` array — **one HTML file per window**, current page in the hash (`#p=3`), Back works, an out-of-range hash clamps to the last page. Each tile is an `<a target="_blank" rel="noopener noreferrer">` to that card's Scryfall page.
+
+Only the 40 tiles of the current page are put in the DOM, and `loading="lazy"` trims that to what is scrolled into view — so a page visit pulls at most 40 images, not 864.
+
+**Run `node scryfall_api/enrich.js --file <the jsonl>` before building**, or the tiles render name-only. Images and links are joined from `scryfall_api/cache/cards.jsonl` (committed) keyed by mtgtop8's spelling — never from `data/*.enriched.jsonl`, which is gitignored. The build prints its own coverage and warns on an empty cache:
+
+```
+images: 864/864 from scryfall_api/cache/cards.jsonl (1419 cached names)
+  1 without image: Unknown Card (1)
+```
+
+A card with no cache entry still occupies a tile (name on a grey plate), so ranks and page counts never shift.
 
 `index.html` is reserved for that picker — passing it as `--out` throws. `slugOf` splits on letter→digit as well as camel case, so `last2Weeks` → `last-2-weeks`; the first version missed the digit boundary and emitted `last2-weeks.html`.
 
@@ -100,9 +122,23 @@ Two traps in that setup, both learned the hard way:
 - The chosen folder is published at the **site root**. The page is at `/`, **not** `/docs/index.html` and not `/site/...`. Those 404 — which looks exactly like "live but empty".
 - Pages only serves `/docs`. `build-site.js` defaults there now, but a `--out` elsewhere publishes nothing while the local build looks fine.
 
-`curl` cannot tell you the page works — it returns the bytes either way, and the table is built by inline JS. Verify by rendering: load the URL in a browser, or headless Chromium and count `#tb tr` (728 as of 2026-09-15, with meta "864 cards across 641 decklists"). The only 404 on the page is `favicon.ico`, which the HTML never references — browsers ask regardless.
+`curl` cannot tell you the page works — it returns the bytes either way, and the grid is built by inline JS. Verify by rendering: load the URL in a browser, or headless Chromium (system Chromium works with the submodule's puppeteer, `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium`) and check:
+
+- `document.querySelectorAll('#grid .tile').length` is **40** on any page except the last.
+- `#count` reads e.g. `728 cards · page 1 of 19 · showing 1–40`. 728 = 864 distinct cards in the 2-week window minus sideboard-only cards, with basics hidden; it moves with the section toggle and the filter.
+- `getComputedStyle(grid).gridTemplateColumns` splits to **4**, and the 40 tiles occupy 4 distinct x and 10 distinct y positions.
+- set `location.hash = '#p=3'` and the tiles re-rank to 81–120.
+- `[...document.querySelectorAll('#grid img')].filter(i => i.complete && i.naturalWidth > 0).length` equals the image count — a card whose Scryfall URL went dead shows as a failed request, not a broken layout.
+
+The order is the thing worth re-checking after any edit: compute mainboard quantity per card from the JSONL in a few lines of Node, drop basics, sort descending, and compare the first six names against `#grid .nm`. As of 2026-09-16 the 2-week page opens Counterspell 581, Lightning Bolt 560, Lórien Revealed 473, Sneaky Snacker 460, Voldaren Epicure 412, Refurbished Familiar 412 — and the sideboard view opens Hydroblast 713, Pyroblast 685, Blue Elemental Blast 597.
+
+The only 404 on the page is `favicon.ico`, which the HTML never references — browsers ask regardless.
 
 The Pages URL **is** the repo slug, so renaming the repo moves the site and the old URL 404s — project site URLs are the documented exception to GitHub's rename redirects (`git push` and `github.com/...` do redirect; `*.github.io` does not). Renamed 2026-09-15 from the misspelled `mtg-competititve-performance`; that Pages URL is dead, the repo URL 301s. Do not rename again without updating the homepage links. GitHub's own workaround, if the URL ever needs to stop being slug-derived, is a custom domain.
+
+### One landmine in the generator itself
+
+`build-site.js` emits the whole page from a JS **template literal**, so every backslash written into that literal is consumed by the generator, not passed through. The first version of the pager wrote `/[#&]p=(\d+)/` and shipped `/[#&]p=(d+)/` — a regex that cannot match a digit, so every page link silently stayed on page 1 while the grid itself looked perfect. Use `[0-9]` in any regex inside the emitted script (that is what `pageFromHash()` does now, with a comment saying why). Named escapes like `\u2019` are fine — they resolve in the generator and appear as the character in the output. Grep the *generated* file when in doubt: `grep '\\\\' docs/last-2-weeks.html` should return nothing.
 
 ## Layout
 
@@ -246,6 +282,7 @@ Verified run of the **2016 view** (`--view all2016Decks` → `data/pauper-all201
 Two things that run did not reconcile, both understood rather than fixed:
 
 - **2,012 reachable against a "2015 decks" headline** — a 0.15% gap. Not pagination (`cp=` ignored, format page renders no nav links), not hidden archetypes (`cp=`, `cp=2`, `cp=3` return identical 28-id sets), not cross-archetype dedupe (an undeduped link walk counted 2,012 listings, 2,012 unique, 0 decks under more than one archetype). The headline is view-level and is printed even on a single-archetype page, so it is the site's own tally, not a sum of what the grid links.
+- **The 3 missing lists are real, not rounding** — mtgtop8 does not round deck counts to 5s, so those 3 exist somewhere. Left alone deliberately: one more probe cycle is not worth 0.15%. **2,012 is the shipped number** — it is the reachable count, the JSONL row count, and what the picker and both pages display. Do not "correct" it to 2,015.
 - **Only 17 of 28 archetypes show a percentage.** The other 11 — all between 1 and 11 lists, consistent with rounding under 1% — render an empty cell, so check 3 covers 17 archetypes and no more. The nav-bar check (check 2) covers all 28, which is the main reason it replaced the percentage arithmetic.
 
 Importing this file is inert — `main()` is behind a `require.main === module` guard. Before that guard, a stray `require()` truncated a committed dataset to zero bytes because `main()` opened the output file before doing anything else. Keep that guard.
