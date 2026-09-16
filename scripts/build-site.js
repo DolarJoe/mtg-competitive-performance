@@ -188,9 +188,10 @@ const html = `<!DOCTYPE html>
   .controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
   input[type=search] { background:#0e1013; color:var(--fg); border:1px solid var(--line);
            border-radius:4px; padding:6px 9px; font:inherit; min-width:200px; }
-  button { background:#0e1013; color:var(--fg); border:1px solid var(--line); border-radius:4px;
+  button, select { background:#0e1013; color:var(--fg); border:1px solid var(--line); border-radius:4px;
            padding:6px 10px; font:inherit; cursor:pointer; }
-  button[aria-pressed=true] { border-color:var(--hi); color:var(--hi); }
+  button[aria-pressed=true], select:focus { border-color:var(--hi); color:var(--hi); }
+  select { appearance:none; padding-right:28px; background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b93a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; background-size:14px; }
   .group { display:flex; gap:4px; align-items:center; }
   .group .lbl { color:var(--dim); font-size:12px; margin-right:2px; }
   .count { color:var(--dim); font-size:12px; margin-left:auto; }
