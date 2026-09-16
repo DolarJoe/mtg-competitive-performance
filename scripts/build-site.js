@@ -250,7 +250,21 @@ const html = `<!DOCTYPE html>
     <input type="search" id="q" placeholder="filter card name…" autocomplete="off">
     <button id="sec" aria-pressed="true">mainboard only</button>
     <button id="basics" aria-pressed="true">hide basics</button>
-    <span class="group"><span class="lbl">sort</span><span id="sorts"></span></span>
+    <span class="group">
+      <select id="sort-field" aria-label="Sort field">
+        <option value="o">occurrences</option>
+        <option value="d">decks</option>
+        <option value="p">% decks</option>
+        <option value="mq">main qty</option>
+        <option value="sq">side qty</option>
+        <option value="na">archetypes</option>
+        <option value="n">name</option>
+      </select>
+      <select id="sort-dir" aria-label="Sort direction">
+        <option value="desc">desc</option>
+        <option value="asc">asc</option>
+      </select>
+    </span>
     <span class="count" id="count"></span>
   </div>
  </div>
@@ -356,12 +370,22 @@ function renderPager(pages, page) {
   el('pager').innerHTML = out.join('');
 }
 
+function getSortState() {
+  return {
+    key: el('sort-field').value,
+    dir: el('sort-dir').value === 'desc' ? -1 : 1
+  };
+}
+
 function render() {
   var rows = visible();
   var pages = Math.max(1, Math.ceil(rows.length / DATA.per));
   var page = Math.min(Math.max(1, pageFromHash()), pages);
   var max = Math.max(1, ...rows.map(function (c) { return value(c, 'o'); }));
   var from = (page - 1) * DATA.per, slice = rows.slice(from, from + DATA.per);
+  var sort = getSortState();
+  sortKey = sort.key;
+  sortDir = sort.dir;
   el('grid').innerHTML = slice.map(function (c) { return tile(c, max); }).join('');
   renderPager(pages, page);
   el('count').textContent = rows.length.toLocaleString() + ' cards \u00b7 page ' + page + ' of ' + pages
@@ -374,19 +398,6 @@ function render() {
   if (pageFromHash() !== page) setHash(page);
 }
 
-function renderSorts() {
-  el('sorts').innerHTML = SORTS.map(function (s) {
-    return '<button data-k="' + s[0] + '" data-label="' + s[1] + '">' + s[1] + '</button>';
-  }).join(' ');
-  document.querySelectorAll('#sorts button').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var k = b.dataset.k;
-      if (k === sortKey) sortDir = -sortDir; else { sortKey = k; sortDir = (k === 'n') ? 1 : -1; }
-      setHash(1); render();
-    });
-  });
-}
-
 el('q').addEventListener('input', function (e) { query = e.target.value.trim().toLowerCase(); setHash(1); render(); });
 
 el('sec').addEventListener('click', function (e) {
@@ -396,6 +407,9 @@ el('sec').addEventListener('click', function (e) {
   setHash(1); render();
 });
 
+el('sort-field').addEventListener('change', function () { setHash(1); render(); });
+  el('sort-dir').addEventListener('change', function () { setHash(1); render(); });
+
 el('basics').addEventListener('click', function (e) {
   hideBasics = !hideBasics;
   e.target.setAttribute('aria-pressed', String(hideBasics));
@@ -404,7 +418,6 @@ el('basics').addEventListener('click', function (e) {
 
 window.addEventListener('hashchange', render);
 
-renderSorts();
 render();
 </script>
 </body>
