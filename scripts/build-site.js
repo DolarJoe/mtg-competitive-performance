@@ -211,19 +211,22 @@ const html = `<!DOCTYPE html>
   @media (max-width:430px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
-          border:1px solid var(--line); border-radius:12px; background:#0e1013;
-          text-decoration:none; padding:7px; }
+          border:1px solid var(--line); border-radius:9px; background:#0e1013;
+          text-decoration:none; overflow:hidden; }
   .tile:hover { border-color:var(--hi); }
-  /* The image carries its own radius; overflow:hidden on the tile rounded only
-   * the top pair of corners and left the art looking square against the caption. */
+  /* The tile carries no padding — the art is flush with the border and the
+   * caption owns its spacing via margin — so overflow:hidden is what rounds the
+   * top corners. The image's own 9px also squares off its bottom corners, where
+   * nothing clips them. Both curves are 9px by request; they are not concentric
+   * (nested would want outer = inner + inset) because there is no inset. */
   .tile img { display:block; width:100%; height:auto; background:#f4f1ea;
-              border-radius:8px; }
-  .tile .rank { position:absolute; top:13px; left:13px; background:rgba(10,12,15,.82); color:var(--hi);
+              border-radius:9px; }
+  .tile .rank { position:absolute; top:6px; left:6px; background:rgba(10,12,15,.82); color:var(--hi);
           border-radius:4px; padding:0 5px; font-size:11px; font-variant-numeric:tabular-nums; }
-  .tile .occ { position:absolute; top:13px; right:13px; background:rgba(10,12,15,.82);
+  .tile .occ { position:absolute; top:6px; right:6px; background:rgba(10,12,15,.82);
           border-radius:4px; padding:0 5px; font-size:11px; color:var(--fg);
           font-variant-numeric:tabular-nums; }
-  .cap { padding:8px 2px 3px; }
+  .cap { margin:8px 8px 6px; }
   .nm { font-size:13px; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2;
         -webkit-box-orient:vertical; overflow:hidden; min-height:2.5em; }
   .stat { color:var(--dim); font-size:11px; margin-top:3px; font-variant-numeric:tabular-nums; }
@@ -231,7 +234,7 @@ const html = `<!DOCTYPE html>
   .tile.basic .nm { color:var(--dim); }
   .noimg { display:flex; align-items:center; justify-content:center; text-align:center;
            aspect-ratio:450/630; padding:14px; color:var(--dim); background:#171a1f;
-           border-radius:8px; font-size:12px; }
+           font-size:12px; }
 
   .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:18px;
            max-width:1000px; margin:0 auto; justify-content:center; }
