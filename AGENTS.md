@@ -5,7 +5,8 @@
 Pauper metagame data pipeline. Three stages, all plain Node with no build step:
 
 ```
-mtgtop8.com  --fetch-decks.js-->  data/*.jsonl  --build-site.js-->  docs/index.html
+mtgtop8.com  --fetch-decks.js-->  data/*.jsonl  --build-site.js-->  docs/<window>.html
+                                  (also regenerates docs/index.html, the window picker Pages serves at /)
                                   --peek.js---->  terminal views
 ```
 
@@ -32,7 +33,7 @@ PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --dry
 
 PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium node scripts/fetch-decks.js --view last2Months
 node scripts/peek.js archetypes | cards [--arch X] | deck <n|name> | events | raw <n>
-node scripts/build-site.js            # data/pauper-last2Weeks.jsonl -> docs/index.html
+node scripts/build-site.js            # -> docs/last-2-weeks.html, and rewrites docs/index.html
 ```
 
 A full `last2Weeks` pull is 641 lists in ~7 min; `last2Months` (2,967) is ~32 min. Single-threaded by design — mtgtop8 is a small site.
@@ -81,7 +82,11 @@ That last one is benign when every link on the page was already collected under 
 
 ## Deployment
 
-`docs/index.html` is a single self-contained file — no CDN, no `fetch`, no build step, opens over `file://`. `node scripts/build-site.js` regenerates it; commit the output or Pages serves the stale copy.
+Every page under `docs/` is self-contained — no CDN, no `fetch`, opens over `file://`. Commit the output; Pages serves whatever was last committed.
+
+`node scripts/build-site.js` writes **one page per view**, named from the JSONL's own `view` field: `pauper-last2Weeks.jsonl` → `docs/last-2-weeks.html`, heading `Pauper card occurrences — Last 2 Weeks`. Each page states its window and its scrape date, because these are mtgtop8's *rolling* views — "Last 2 Weeks" means the fortnight before that scrape, not a calendar range. Then it rewrites `docs/index.html` as a picker, listing whatever window pages exist on disk, read back from each page's own embedded `DATA` so the index cannot advertise a page that isn't there.
+
+`index.html` is reserved for that picker — passing it as `--out` throws. `slugOf` splits on letter→digit as well as camel case, so `last2Weeks` → `last-2-weeks`; the first version missed the digit boundary and emitted `last2-weeks.html`.
 
 **Live at <https://dolarjoe.github.io/mtg-competitive-performance/>** — Settings → Pages → *Deploy from a branch* → `main`, folder **`/docs`**. Stable entry point: <https://dolarjoe.github.io/> (a clickthrough), cloned alongside this repo at `../DolarJoe.github.io`.
 
