@@ -195,35 +195,46 @@ const html = `<!DOCTYPE html>
   .group .lbl { color:var(--dim); font-size:12px; margin-right:2px; }
   .count { color:var(--dim); font-size:12px; margin-left:auto; }
 
-  /* 4 tiles across, 10 rows per page. Reflow to fewer columns rather than
-   * shrink the art below ~200px; the page still holds 40 cards. */
-  .grid { display:grid; gap:14px; padding:16px 18px 0; align-content:start;
-          grid-template-columns:repeat(4, minmax(0,1fr)); max-width:1560px; }
-  @media (max-width:1200px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
-  @media (max-width:820px)  { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (max-width:480px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
+  /* Header, grid and pager share one centred measure, so the title lines up
+   * with the tiles instead of floating at the viewport edge. */
+  .wrap { max-width:1000px; margin:0 auto; }
+
+  /* 4 tiles across, 10 rows per page, ~232px of art each: width-capped and
+   * centred, not stretched — at full viewport width the tiles ran 341px and the
+   * page read as four towering columns. Reflow to fewer columns rather than
+   * shrink the art below ~200px; either way the page still holds 40 cards. */
+  .grid { display:grid; gap:12px; padding:16px 18px 0; align-content:start;
+          grid-template-columns:repeat(4, minmax(0,1fr)); max-width:1000px;
+          margin:0 auto; }
+  @media (max-width:860px)  { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  @media (max-width:640px)  { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:430px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
-          border:1px solid var(--line); border-radius:6px; background:#0e1013;
-          text-decoration:none; overflow:hidden; }
+          border:1px solid var(--line); border-radius:12px; background:#0e1013;
+          text-decoration:none; padding:7px; }
   .tile:hover { border-color:var(--hi); }
-  .tile img { display:block; width:100%; height:auto; background:#f4f1ea; }
-  .tile .rank { position:absolute; top:6px; left:6px; background:rgba(10,12,15,.82); color:var(--hi);
-          border-radius:4px; padding:1px 6px; font-size:12px; font-variant-numeric:tabular-nums; }
-  .tile .occ { position:absolute; top:6px; right:6px; background:rgba(10,12,15,.82);
-          border-radius:4px; padding:1px 6px; font-size:12px; color:var(--fg);
+  /* The image carries its own radius; overflow:hidden on the tile rounded only
+   * the top pair of corners and left the art looking square against the caption. */
+  .tile img { display:block; width:100%; height:auto; background:#f4f1ea;
+              border-radius:8px; }
+  .tile .rank { position:absolute; top:13px; left:13px; background:rgba(10,12,15,.82); color:var(--hi);
+          border-radius:4px; padding:0 5px; font-size:11px; font-variant-numeric:tabular-nums; }
+  .tile .occ { position:absolute; top:13px; right:13px; background:rgba(10,12,15,.82);
+          border-radius:4px; padding:0 5px; font-size:11px; color:var(--fg);
           font-variant-numeric:tabular-nums; }
-  .cap { padding:7px 9px 9px; }
+  .cap { padding:8px 2px 3px; }
   .nm { font-size:13px; line-height:1.25; display:-webkit-box; -webkit-line-clamp:2;
         -webkit-box-orient:vertical; overflow:hidden; min-height:2.5em; }
   .stat { color:var(--dim); font-size:11px; margin-top:3px; font-variant-numeric:tabular-nums; }
   .meter { height:3px; background:var(--bar); margin-top:6px; border-radius:2px; }
   .tile.basic .nm { color:var(--dim); }
   .noimg { display:flex; align-items:center; justify-content:center; text-align:center;
-           aspect-ratio:450/630; padding:16px; color:var(--dim); background:#171a1f;
-           border-bottom:1px solid var(--line); font-size:13px; }
+           aspect-ratio:450/630; padding:14px; color:var(--dim); background:#171a1f;
+           border-radius:8px; font-size:12px; }
 
-  .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:18px; }
+  .pager { display:flex; gap:6px; align-items:center; flex-wrap:wrap; padding:18px;
+           max-width:1000px; margin:0 auto; justify-content:center; }
   .pager a, .pager span.cur { border:1px solid var(--line); border-radius:4px; padding:5px 9px;
            color:var(--fg); text-decoration:none; font-size:12px; font-variant-numeric:tabular-nums; }
   .pager span.cur { border-color:var(--hi); color:var(--hi); }
@@ -234,6 +245,7 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
 <header>
+ <div class="wrap">
   <a class="home" href="./">← all windows</a>
   <h1>Pauper card occurrences <span class="win">— ${label}</span></h1>
   <div class="sub" id="meta"></div>
@@ -244,6 +256,7 @@ const html = `<!DOCTYPE html>
     <span class="group"><span class="lbl">sort</span><span id="sorts"></span></span>
     <span class="count" id="count"></span>
   </div>
+ </div>
 </header>
 <div class="grid" id="grid"></div>
 <nav class="pager" id="pager"></nav>
