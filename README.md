@@ -1,5 +1,13 @@
 # Competitive Ranking — MTG
 
+## Subprojects
+
+| Path           | What it is                                                              |
+| -------------- | ----------------------------------------------------------------------- |
+| `scripts/`     | mtgtop8 scraper, terminal views, static site generator                   |
+| `scryfall_api/` | thin Scryfall client + `enrich.js`, which adds `img`/`url` to the JSONL |
+| `MTG-API/`     | git submodule, upstream scraper — unused by the above                    |
+
 ## Submodules
 
 | Path      | Upstream                                    |

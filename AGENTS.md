@@ -2,15 +2,16 @@
 
 ## Project Overview
 
-Pauper metagame data pipeline. Three stages, all plain Node with no build step:
+Pauper metagame data pipeline. Plain Node throughout, no build step:
 
 ```
 mtgtop8.com  --fetch-decks.js-->  data/*.jsonl  --build-site.js-->  docs/<window>.html
                                   (also regenerates docs/index.html, the window picker Pages serves at /)
                                   --peek.js---->  terminal views
+   scryfall.com --enrich.js---->  data/*.enriched.jsonl   (img + url on every card)
 ```
 
-`scripts/` is the working code. `MTG-API/` is a read-only submodule (Express + Mongo scraper over the same site) that this pipeline does **not** use — see the MTG-API sections at the end for why.
+`scripts/` is the working code. `scryfall_api/` is a second subproject in the same repo — the Scryfall client behind that last arrow. `MTG-API/` is a read-only submodule (Express + Mongo scraper over the same site) that this pipeline does **not** use — see the MTG-API sections at the end for why.
 
 ## Setup Commands
 
@@ -106,6 +107,8 @@ The Pages URL **is** the repo slug, so renaming the repo moves the site and the 
 ## Layout
 
 `MTG-API/` is a git submodule → <https://github.com/Vince-maple-byte/MTG-API>. Clone with `--recursive`, or run `git submodule update --init --recursive`.
+
+`scryfall_api/` is **not** a submodule — it is ordinary code in this repo, alongside `scripts/`.
 
 Treat the submodule as read-only upstream unless the task is explicitly to patch it. Prefer fixes in the parent project; when patching upstream, expect the pinned commit to move on `git submodule update --remote`.
 
@@ -274,6 +277,52 @@ These selectors are load-bearing and are *not* what the upstream scraper guesses
 - The `nav_form` / `PageSubmit_arch` strings appear in the **format** page's inline `<script>` even though that page has no such form. Grepping for the identifier proves nothing; look for `<form name=nav_form>` and `onclick=PageSubmit_arch(` in the markup.
 
 Related scripts: `scripts/probe-depth.js` (available lists per archetype), `scripts/scrape-pauper.js` (submodule scraper, no server/DB).
+
+## scryfall_api: Images and Links for the JSONL
+
+`scryfall_api/` is plain Node, zero deps, no `package.json`. It resolves card names against Scryfall and rewrites the decklist JSONL with two extra fields per card: `img` (a `cards.scryfall.io` URL) and `url` (the card's Scryfall page). `imgBack` is added for transform/modal double-faced cards.
+
+```bash
+node scryfall_api/enrich.js --dry                    # pack plan, no network
+node scryfall_api/enrich.js --file data/pauper-last2Weeks.jsonl
+node scryfall_api/search.js --exact Duress "Gitaxian Probe"
+node scryfall_api/search.js "cmc=1 is:pauper"        # any Scryfall query
+```
+
+Output is `data/<same>.enriched.jsonl` — **gitignored**, 17 MB for both windows, regenerable. The cache `scryfall_api/cache/cards.jsonl` (324 KB, 1,419 cards) **is** committed: it is the thing that costs network calls.
+
+### The two limits, as configured
+
+Scryfall allows a 1,000-character search query and calls 500 ms apart. This code uses **980 characters and 600 ms**, both overridable (`--budget`, `--delay`). The 980 is measured on the **encoded** query: names are full of spaces, encoding turns each into three characters, and packing on decoded length would put 1,100+-character queries on the wire. ~35 names fit per batch that way; 871 names = 28 batches.
+
+`scryfall_api/enrich.js --dry` prints the pack plan (batches, min/median/max query characters, first batch verbatim) without touching the network. Use it before changing the budget.
+
+### Verified runs
+
+| Run | Names | Requests | Time | Outcome |
+| --- | --- | --- | --- | --- |
+| `last2Weeks` cold | 864 | 42 | 31.6s | 15,486 card lines annotated, 0 unresolved |
+| `last2Weeks` DFC repair | 4 | 1 | 0.3s | backfilled, 108 lines gained `imgBack` |
+| `all2016Decks` | 871 (556 new) | 19 | 12.8s | 49,545 lines, 1 unresolved |
+| `last2Weeks` warm | 0 | 0 | 0.1s | cache hit, no network |
+
+Requests exceed batches because 175 is the page ceiling and a 35-name batch can spill. The single unresolved name across both windows is mtgtop8's literal placeholder **"Unknown Card"**.
+
+### Scryfall syntax landmines
+
+Measured against the live API; `/docs/api` is client-rendered and greps as nav text only. Each of these cost a bug:
+
+- **No `exact:` keyword.** `(exact:"Duress")` → `400: Unknown keyword "exact"`. Exact name is the `!` operator: `(!"Duress" or !"Daze")`. `exact` as a field name exists only on `POST /cards/collection`.
+- **`unique=card` names double-faced cards by both halves.** `!"Delver of Secrets"` returns a card named `Delver of Secrets // Insectile Aberration`. Match results by full name, front half, and every `card_faces[].name` (`cardKeys()`) or every DFC is silently lost — that is how the first run shipped 108 imageless lines.
+- **Transform/modal-DFC cards have no `image_uris` on the card object**; both images are on `card_faces[]`. Split cards are the reverse: one composite image on the parent, nothing on the faces. Read parent first, fall back to faces.
+- **`/cards/search` omits `oraclecard_uri`** (`undefined` on search results, present on single-card endpoints). `url` is therefore `scryfall_uri`, a specific printing. The canonical `scryfall.com/cards/oracle/<oracle_id>` must be built from `card.oracle_id`.
+- **`scryfall_uri` carries `?utm_source=api`.** Kept — Scryfall requests attribution.
+- **An empty search is a 404** (*"Your query didn't match any cards"*), not an empty 200. `searchAll()` swallows that into `[]`; bad syntax stays a 400 and throws. `/cards/named?exact=` 404s the same way for a name that doesn't exist.
+- Requests need a real `User-Agent` and `Accept` header or Scryfall refuses them.
+
+Also: name mismatch across sources is normal, not a parse bug. mtgtop8 writes `Bedeck / Bedazzle`; Scryfall's name is `Bedeck // Bedazzle`, and its `!` operator folds the difference. `keyOf()`/`looseKey()` keep the cache keyed by the mtgtop8 spelling while storing Scryfall's canonical `name`.
+
+The cache treats a row with no `img` as stale and refetches it, so an image-picker bug heals on the next run instead of being cached forever.
 
 ## Environment Gotchas
 

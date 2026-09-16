@@ -5,3 +5,6 @@ npm-debug.log*
 !*.env.example
 *.log
 .DS_Store
+
+# scryfall_api derived output (rebuild with node scryfall_api/enrich.js)
+data/*.enriched.jsonl
