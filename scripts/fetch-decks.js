@@ -20,7 +20,7 @@
  *   --max-pages N        cap archetype pages walked (default 40, a safety bound)
  *   --only NAME          substring filter on archetype name, repeatable
  *   --limit-archetypes N debug: first N archetypes only
- *   --delay MS           polite gap between requests (default 300)
+ *   --delay MS           polite gap between requests (default 900)
  *   --dry                list archetypes + decklist counts, fetch nothing
  */
 
@@ -75,7 +75,7 @@ function parseArgs(argv) {
     }
     // Safety bound only. Real termination is "no fresh links" or a partial page.
     opts.maxPages = Number(opts.maxPages ?? 40);
-    opts.delay = Number(opts.delay ?? 300);
+    opts.delay = Number(opts.delay ?? 900);
     opts.maxPerArch = opts.maxPerArch === undefined ? Infinity : Number(opts.maxPerArch);
     opts.out = opts.out || path.join('data', `pauper-${opts.view}.jsonl`);
     return opts;
@@ -161,17 +161,29 @@ async function main() {
 
     /* A --dry run must not touch the output file. Truncating up front is how a
      * stray `require()` of this file once zeroed a committed dataset. */
+    const seen = new Set();
     let stream;
+    const resume = !opts.dry && fs.existsSync(opts.out);
     if (opts.dry) {
         stream = { write() {}, end() {} };
     } else {
         if (!fs.existsSync(path.dirname(opts.out))) fs.mkdirSync(path.dirname(opts.out), { recursive: true });
-        stream = fs.createWriteStream(opts.out, { flags: 'w' });
+        if (resume) {
+            // Preload the existing JSONL so an interrupted run only fetches new decks.
+            for (const line of fs.readFileSync(opts.out, 'utf8').split('\n')) {
+                if (!line.trim()) continue;
+                try {
+                    const row = JSON.parse(line);
+                    if (row.deckUrl) seen.add(row.deckUrl);
+                } catch {}
+            }
+            console.log(`resume=true existing decklists=${seen.size}`);
+        }
+        stream = fs.createWriteStream(opts.out, { flags: resume ? 'a' : 'w' });
     }
 
     const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
     const page = await browser.newPage();
-    const seen = new Set();
     const summary = [];
     const started = Date.now();
 

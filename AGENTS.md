@@ -45,6 +45,8 @@ A full `last2Weeks` pull is 641 lists in ~7 min; `all2016Decks` (2,012) took 24 
 
 ## Data Files
 
+**Which time periods exist is discovered from the files, not from this document.** List `data/pauper-*.jsonl` (a window is "shipped" when it has both `<view>.jsonl` and `<view>.enriched.jsonl`) and read each file's `view` field; `docs/index.html` is regenerated from the same source. This file is deliberately not a registry of windows — new windows get scraped without anything here being updated.
+
 `data/pauper-<view>.jsonl`, one decklist per line: `view`, `archetype`, `deckUrl`, `deckName`, `player`, `event`, `eventId`, `placing`, `cards[]{count,name,section,typeGroup}`, `mainboardCount`, `sideboardCount`, `uniqueCards`. Written incrementally, so an interrupted run keeps its work.
 
 ### Deck size anomalies are real, not parser bugs
