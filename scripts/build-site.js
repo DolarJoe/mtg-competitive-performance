@@ -209,6 +209,7 @@ const html = `<!DOCTYPE html>
           margin:0 auto; }
   @media (max-width:860px)  { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
   @media (max-width:640px)  { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width:430px)  { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .tile { border:none; } .cap { display:none; } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
           border:1px solid var(--line); border-radius:12px; background:#0e1013;
