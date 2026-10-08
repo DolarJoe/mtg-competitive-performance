@@ -64,7 +64,9 @@ const VIEWS = {
 function parseArgs(argv) {
     const opts = { only: [] };
     for (let i = 0; i < argv.length; i++) {
-        const key = argv[i].replace(/^--/, '');
+        // accept --max-pages as well as --maxPages: dashed keys were silently
+        // dropped, so --max-pages 200 never overrode the 40-page cap.
+        const key = argv[i].replace(/^--/, '').replace(/-([a-z])/g, (_, c) => c.toUpperCase());
         if (key === 'dry') { opts.dry = true; continue; }
         if (key === 'only') { opts.only.push(argv[++i]); continue; }
         opts[key] = argv[++i];
