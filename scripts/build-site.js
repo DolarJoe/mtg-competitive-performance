@@ -254,7 +254,6 @@ const html = `<!DOCTYPE html>
       <select id="sort-field" aria-label="Sort field">
         <option value="o">occurrences</option>
         <option value="d">decks</option>
-        <option value="p">% decks</option>
         <option value="mq">main qty</option>
         <option value="sq">side qty</option>
         <option value="na">archetypes</option>
@@ -275,7 +274,7 @@ const html = `<!DOCTYPE html>
 const DATA = ${payload};
 /* Default sort is the old table's: occurrences, descending. */
 let sortKey = 'o', sortDir = -1, section = 'main', hideBasics = true, query = '';
-const SORTS = [['o','occurrences'],['d','decks'],['p','% decks'],['mq','main qty'],['sq','side qty'],['na','archetypes'],['n','name']];
+const SORTS = [['o','occurrences'],['d','decks'],['mq','main qty'],['sq','side qty'],['na','archetypes'],['n','name']];
 
 function el(id) { return document.getElementById(id); }
 
@@ -378,14 +377,14 @@ function getSortState() {
 }
 
 function render() {
+  var sort = getSortState();
+  sortKey = sort.key;
+  sortDir = sort.dir;
   var rows = visible();
   var pages = Math.max(1, Math.ceil(rows.length / DATA.per));
   var page = Math.min(Math.max(1, pageFromHash()), pages);
   var max = Math.max(1, ...rows.map(function (c) { return value(c, 'o'); }));
   var from = (page - 1) * DATA.per, slice = rows.slice(from, from + DATA.per);
-  var sort = getSortState();
-  sortKey = sort.key;
-  sortDir = sort.dir;
   el('grid').innerHTML = slice.map(function (c) { return tile(c, max); }).join('');
   renderPager(pages, page);
   el('count').textContent = rows.length.toLocaleString() + ' cards \u00b7 page ' + page + ' of ' + pages
