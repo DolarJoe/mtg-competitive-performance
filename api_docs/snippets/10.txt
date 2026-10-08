@@ -1,0 +1,108 @@
+POST /cards/collection
+
+Rate limit: 2/second (500ms)
+
+Supported formats: json
+
+Accepts a JSON array of card identifiers, and returns a List object with the collection of requested cards. A maximum of 75 card references may be submitted per request. The request must be posted with Content-Type as application/json.
+Parameter 	Type 	Atn 	Details
+identifiers 	Array 		An array of JSON objects, each one a card identifier.
+pretty 	Boolean 	Optional 	If true, the returned JSON will be prettified. Avoid using for production code.
+Card Identifiers
+
+Each submitted card identifier must be a JSON object with one or more of the keys id, mtgo_id, multiverse_id, oracle_id, illustration_id, name, set, and collector_number. The following combinations are valid identifier schemas:
+Schema 	Format 	Description
+
+id
+	
+
+UUID
+	
+
+Finds a card with the specified Scryfall id.
+
+mtgo_id
+	
+
+Integer
+	
+
+Finds a card with the specified mtgo_id or mtgo_foil_id.
+
+multiverse_id
+	
+
+Integer
+	
+
+Finds a card with the specified value among its multiverse_ids.
+
+oracle_id
+	
+
+UUID
+	
+
+Finds the newest edition of cards with the specified oracle_id.
+
+illustration_id
+	
+
+UUID
+	
+
+Finds the preferred scans of cards with the specified illustration_id.
+
+name
+	
+
+String
+	
+
+Finds the newest edition of a card with the specified name.
+
+name,set
+	
+
+Strings
+	
+
+Finds a card matching the specified name and set.
+
+collector_number,set
+	
+
+Strings
+	
+
+Finds a card with the specified collector_number and set. Note that collector numbers are strings.
+
+Multiple identifier schemas may be included in a single request. Each identifier will return up to one card. Identifiers that are not found will be returned in the not_found array. While cards will be returned in the order that they were requested, cards that aren’t found will throw off the mapping of request identifiers to results, so you should not rely on positional index alone while parsing the data.
+Example Request
+POST https://api.scryfall.com/cards/collection
+
+{
+  "identifiers": [
+    {
+      "id": "683a5707-cddb-494d-9b41-51b4584ded69"
+    },
+    {
+      "name": "Ancient Tomb"
+    },
+    {
+      "set": "mrd",
+      "collector_number": "150"
+    }
+  ]
+}
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "list",
+  "not_found": [],
+  "data": [
+    {
+      "object": "card",
+      NOTE TO AGENT card objects below. Cut for brevity

@@ -1,0 +1,25 @@
+Rate Limits
+
+The Scryfall API (api.scryfall.com) has the following hard rate limits:
+
+    /cards/search — 2/second (500ms)
+    /cards/named — 2/second (500ms)
+    /cards/random — 2/second (500ms)
+    /cards/collection — 2/second (500ms)
+    /cards/manifest — 10/minute (6,000ms)
+    All other methods — 10/second (100ms)
+
+The direct file origins located at *.scryfall.io do not have rate limits.
+
+Submitting excessive requests to API server may result in an HTTP 429 Too Many Requests status code. Recieving an HTTP 429 response will result in your access being limited for 30 seconds. Continuing to overload the API after this point may result in a temporary or permanent ban of your application. Applications that receive constant rate limit warnings over a longer period may also be blocked.
+
+It is not acceptable to ignore HTTP 429 responses. You must act to reduce your application’s overages.
+
+We encourage you to cache the data you download from Scryfall or process it locally in your own system, at least for 24 hours. Scryfall provides our entire database compressed for download in daily bulk data files.
+
+If you need to rapidly look up card names, prices, or resolve a large number of card images, you must use the bulk data files.
+
+While we make incremental updates to card data daily, take note that:
+
+    We only update prices for cards once per day. Fetching card data more frequently than 24 hours will not yield new prices.
+    Updates to gameplay data (such as card names, Oracle text, mana costs, etc) are much less frequent. If you only need gameplay information, downloading card data once per week or right after set releases would most likely be sufficient.

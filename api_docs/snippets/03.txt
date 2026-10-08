@@ -1,0 +1,1163 @@
+Layouts and Faces
+
+The layout property categorizes the arrangement of card parts, faces, and other bounded regions on cards. The layout can be used to programmatically determine which other properties on a card you can expect.
+
+Specifically:
+
+    Cards with the layouts split, flip, transform, and double_faced_token will always have a card_faces property describing the distinct faces.
+    Cards with the layout meld will always have an all_parts property pointing to the other meld parts.
+
+Layout 	Description 	Examples
+
+normal
+	
+
+A standard Magic card with one face
+	
+
+Example Cards
+
+split
+	
+
+A split-faced card
+	
+
+Example Cards
+
+flip
+	
+
+Cards that invert vertically with the flip keyword
+	
+
+Example Cards
+
+transform
+	
+
+Double-sided cards that transform
+	
+
+Example Cards
+
+modal_dfc
+	
+
+Double-sided cards that can be played either-side
+	
+
+Example Cards
+
+meld
+	
+
+Cards with meld parts printed on the back
+	
+
+Example Cards
+
+leveler
+	
+
+Cards with Level Up
+	
+
+Example Cards
+
+class
+	
+
+Class-type enchantment cards
+	
+
+Example Cards
+
+case
+	
+
+Case-type enchantment cards
+	
+
+Example Cards
+
+saga
+	
+
+Saga-type cards
+	
+
+Example Cards
+
+adventure
+	
+
+Cards with an Adventure spell part
+	
+
+Example Cards
+
+prepare
+	
+
+Cards with a prepared spell part
+	
+
+Example Cards
+
+mutate
+	
+
+Cards with Mutate
+	
+
+Example Cards
+
+prototype
+	
+
+Cards with Prototype
+	
+
+Example Cards
+
+battle
+	
+
+Battle-type cards
+	
+
+Example Cards
+
+planar
+	
+
+Plane and Phenomenon-type cards
+	
+
+Example Cards
+
+scheme
+	
+
+Scheme-type cards
+	
+
+Example Cards
+
+vanguard
+	
+
+Vanguard-type cards
+	
+
+Example Cards
+
+token
+	
+
+Token cards
+	
+
+Example Cards
+
+double_faced_token
+	
+
+Tokens with another token printed on the back
+	
+
+Example Cards
+
+emblem
+	
+
+Emblem cards
+	
+
+Example Cards
+
+augment
+	
+
+Cards with Augment
+	
+
+Example Cards
+
+host
+	
+
+Host-type cards
+	
+
+Example Cards
+
+art_series
+	
+
+Art Series collectable double-faced cards
+	
+
+Example Cards
+
+reversible_card
+	
+
+A Magic card with two sides that are unrelated
+	
+
+Example Cards
+
+front_card
+	
+
+A extra card that indicates a deck type
+	
+
+Example Cards
+Card Faces
+
+Magic cards can include multiple faces on a single piece of card stock. Scryfall includes information about each of these card faces using the card_faces property on API objects. Please note the following types of multi-face cards and how Scryfall will describe them:
+
+Split cards (Comp. rules term) · Example split cards
+Split cards are sorceries or instant cards that include two faces and the caster can choose which face to cast. The back of a split card is the normal Magic back.
+GET https://api.scryfall.com/cards/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "card",
+  "id": "0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b",
+  "oracle_id": "9842734c-1eac-4509-a731-4c22017ae586",
+  "multiverse_ids": [
+    500936
+  ],
+  "mtgo_id": 85730,
+  "tcgplayer_id": 227383,
+  "cardmarket_id": 514789,
+  "name": "Wear // Tear",
+  "lang": "en",
+  "released_at": "2020-11-20",
+  "uri": "https://api.scryfall.com/cards/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b",
+  "scryfall_uri": "https://scryfall.com/card/cmr/456/wear-tear?utm_source=api",
+  "layout": "split",
+  "highres_image": true,
+  "image_status": "highres_scan",
+  "image_updated_at": "2026-07-13T07:44:53Z",
+  "image_uris": {
+    "small": "https://cards.scryfall.io/small/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.jpg?1783928693",
+    "normal": "https://cards.scryfall.io/normal/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.jpg?1783928693",
+    "large": "https://cards.scryfall.io/large/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.jpg?1783928693",
+    "png": "https://cards.scryfall.io/png/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.png?1783928693",
+    "art_crop": "https://cards.scryfall.io/art_crop/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.jpg?1783928693",
+    "border_crop": "https://cards.scryfall.io/border_crop/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.jpg?1783928693",
+    "thumb": "https://cards.scryfall.io/thumb/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.webp?1783928693",
+    "grid": "https://cards.scryfall.io/grid/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.webp?1783928693",
+    "display": "https://cards.scryfall.io/display/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.webp?1783928693",
+    "art": "https://cards.scryfall.io/art/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.webp?1783928693",
+    "crop": "https://cards.scryfall.io/crop/front/0/f/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b.webp?1783928693"
+  },
+  "mana_cost": "{1}{R} // {W}",
+  "cmc": 3,
+  "type_line": "Instant // Instant",
+  "colors": [
+    "R",
+    "W"
+  ],
+  "color_identity": [
+    "R",
+    "W"
+  ],
+  "keywords": [
+    "Fuse"
+  ],
+  "card_faces": [
+    {
+      "object": "card_face",
+      "name": "Wear",
+      "mana_cost": "{1}{R}",
+      "type_line": "Instant",
+      "oracle_text": "Destroy target artifact.\nFuse (You may cast one or both halves of this card from your hand.)",
+      "artist": "Ryan Pancoast",
+      "artist_id": "89cc9475-dda2-4d13-bf88-54b92867a25c",
+      "illustration_id": "35dc8f1e-5c26-4f3f-98eb-62123968a04f"
+    },
+    {
+      "object": "card_face",
+      "name": "Tear",
+      "mana_cost": "{W}",
+      "type_line": "Instant",
+      "oracle_text": "Destroy target enchantment.\nFuse (You may cast one or both halves of this card from your hand.)",
+      "artist": "Ryan Pancoast",
+      "artist_id": "89cc9475-dda2-4d13-bf88-54b92867a25c"
+    }
+  ],
+  "legalities": {
+    "standard": "not_legal",
+    "future": "not_legal",
+    "historic": "legal",
+    "timeless": "legal",
+    "gladiator": "legal",
+    "pioneer": "legal",
+    "modern": "legal",
+    "legacy": "legal",
+    "pauper": "not_legal",
+    "vintage": "legal",
+    "penny": "not_legal",
+    "commander": "legal",
+    "oathbreaker": "legal",
+    "standardbrawl": "not_legal",
+    "brawl": "legal",
+    "competitivebrawl": "legal",
+    "alchemy": "not_legal",
+    "paupercommander": "not_legal",
+    "duel": "legal",
+    "oldschool": "not_legal",
+    "premodern": "not_legal",
+    "predh": "not_legal",
+    "tlr": "legal"
+  },
+  "games": [
+    "paper",
+    "mtgo"
+  ],
+  "reserved": false,
+  "game_changer": false,
+  "foil": false,
+  "nonfoil": true,
+  "finishes": [
+    "nonfoil"
+  ],
+  "oversized": false,
+  "promo": false,
+  "reprint": true,
+  "variation": false,
+  "set_id": "39de6fbf-1f11-48d0-8f04-f0407f6a0732",
+  "set": "cmr",
+  "set_name": "Commander Legends",
+  "set_type": "draft_innovation",
+  "set_uri": "https://api.scryfall.com/sets/39de6fbf-1f11-48d0-8f04-f0407f6a0732",
+  "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Acmr&unique=prints",
+  "scryfall_set_uri": "https://scryfall.com/sets/cmr?utm_source=api",
+  "rulings_uri": "https://api.scryfall.com/cards/0f279560-7e9f-4a6d-9fd6-6c8c6bd94a1b/rulings",
+  "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A9842734c-1eac-4509-a731-4c22017ae586&unique=prints",
+  "collector_number": "456",
+  "digital": false,
+  "rarity": "uncommon",
+  "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+  "artist": "Ryan Pancoast",
+  "artist_ids": [
+    "89cc9475-dda2-4d13-bf88-54b92867a25c"
+  ],
+  "illustration_id": "35dc8f1e-5c26-4f3f-98eb-62123968a04f",
+  "border_color": "black",
+  "frame": "2015",
+  "full_art": false,
+  "textless": false,
+  "booster": false,
+  "story_spotlight": false,
+  "edhrec_rank": 1038,
+  "prices": {
+    "usd": "2.46",
+    "usd_foil": null,
+    "usd_etched": null,
+    "eur": "1.78",
+    "eur_foil": null,
+    "tix": "7.04"
+  },
+  "related_uris": {
+    "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=500936&printed=false",
+    "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DWear%2B%252F%252F%2BTear",
+    "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DWear%2B%252F%252F%2BTear",
+    "edhrec": "https://edhrec.com/route/?cc=Wear+%2F%2F+Tear"
+  },
+  "purchase_uris": {
+    "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F227383%3Fpage%3D1",
+    "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=514789&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+    "cardhoarder": "https://www.cardhoarder.com/cards/85730?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+  }
+}
+
+Flip cards (Comp. rules term) · Example flip cards
+Flip cards have two parts of a permanent printed vertically on one side of the card. During play, an ability on the card causes the permanent to flip (rotate 180°) to the other side. The back of a flip card is the normal Magic back.
+GET https://api.scryfall.com/cards/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "card",
+  "id": "0b61d772-2d8b-4acf-9dd2-b2e8b03538c8",
+  "oracle_id": "d83bb32d-f409-421a-9d93-bd7ea3240b47",
+  "multiverse_ids": [
+    87599
+  ],
+  "mtgo_id": 22176,
+  "mtgo_foil_id": 22177,
+  "tcgplayer_id": 12430,
+  "cardmarket_id": 12658,
+  "name": "Erayo, Soratami Ascendant // Erayo's Essence",
+  "lang": "en",
+  "released_at": "2005-06-03",
+  "uri": "https://api.scryfall.com/cards/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8",
+  "scryfall_uri": "https://scryfall.com/card/sok/35/erayo-soratami-ascendant-erayos-essence?utm_source=api",
+  "layout": "flip",
+  "highres_image": true,
+  "image_status": "highres_scan",
+  "image_updated_at": "2026-07-13T12:02:44Z",
+  "image_uris": {
+    "small": "https://cards.scryfall.io/small/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.jpg?1783944164",
+    "normal": "https://cards.scryfall.io/normal/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.jpg?1783944164",
+    "large": "https://cards.scryfall.io/large/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.jpg?1783944164",
+    "png": "https://cards.scryfall.io/png/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.png?1783944164",
+    "art_crop": "https://cards.scryfall.io/art_crop/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.jpg?1783944164",
+    "border_crop": "https://cards.scryfall.io/border_crop/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.jpg?1783944164",
+    "thumb": "https://cards.scryfall.io/thumb/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.webp?1783944164",
+    "grid": "https://cards.scryfall.io/grid/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.webp?1783944164",
+    "display": "https://cards.scryfall.io/display/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.webp?1783944164",
+    "art": "https://cards.scryfall.io/art/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.webp?1783944164",
+    "crop": "https://cards.scryfall.io/crop/front/0/b/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8.webp?1783944164"
+  },
+  "mana_cost": "{1}{U}",
+  "cmc": 2,
+  "type_line": "Legendary Creature — Moonfolk Monk // Legendary Enchantment",
+  "power": "1",
+  "toughness": "1",
+  "colors": [
+    "U"
+  ],
+  "color_identity": [
+    "U"
+  ],
+  "keywords": [
+    "Flying"
+  ],
+  "card_faces": [
+    {
+      "object": "card_face",
+      "name": "Erayo, Soratami Ascendant",
+      "mana_cost": "{1}{U}",
+      "type_line": "Legendary Creature — Moonfolk Monk",
+      "oracle_text": "Flying\nWhenever the fourth spell of a turn is cast, flip Erayo.",
+      "power": "1",
+      "toughness": "1",
+      "artist": "Matt Cavotta",
+      "artist_id": "2e6a0611-9411-4ba4-98e3-c0e18cbf9f83",
+      "illustration_id": "99cab97a-9861-4a5a-8578-6c742d192183"
+    },
+    {
+      "object": "card_face",
+      "name": "Erayo's Essence",
+      "mana_cost": "",
+      "type_line": "Legendary Enchantment",
+      "oracle_text": "Whenever an opponent casts their first spell each turn, counter that spell.",
+      "artist": "Matt Cavotta",
+      "artist_id": "2e6a0611-9411-4ba4-98e3-c0e18cbf9f83"
+    }
+  ],
+  "legalities": {
+    "standard": "not_legal",
+    "future": "not_legal",
+    "historic": "not_legal",
+    "timeless": "not_legal",
+    "gladiator": "not_legal",
+    "pioneer": "not_legal",
+    "modern": "legal",
+    "legacy": "legal",
+    "pauper": "not_legal",
+    "vintage": "legal",
+    "penny": "not_legal",
+    "commander": "banned",
+    "oathbreaker": "legal",
+    "standardbrawl": "not_legal",
+    "brawl": "not_legal",
+    "competitivebrawl": "not_legal",
+    "alchemy": "not_legal",
+    "paupercommander": "not_legal",
+    "duel": "legal",
+    "oldschool": "not_legal",
+    "premodern": "not_legal",
+    "predh": "banned",
+    "tlr": "restricted"
+  },
+  "games": [
+    "paper",
+    "mtgo"
+  ],
+  "reserved": false,
+  "game_changer": false,
+  "foil": true,
+  "nonfoil": true,
+  "finishes": [
+    "nonfoil",
+    "foil"
+  ],
+  "oversized": false,
+  "promo": false,
+  "reprint": false,
+  "variation": false,
+  "set_id": "4db16ad3-2b95-442f-bb6b-e9aa7fe7f769",
+  "set": "sok",
+  "set_name": "Saviors of Kamigawa",
+  "set_type": "expansion",
+  "set_uri": "https://api.scryfall.com/sets/4db16ad3-2b95-442f-bb6b-e9aa7fe7f769",
+  "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Asok&unique=prints",
+  "scryfall_set_uri": "https://scryfall.com/sets/sok?utm_source=api",
+  "rulings_uri": "https://api.scryfall.com/cards/0b61d772-2d8b-4acf-9dd2-b2e8b03538c8/rulings",
+  "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Ad83bb32d-f409-421a-9d93-bd7ea3240b47&unique=prints",
+  "collector_number": "35",
+  "digital": false,
+  "rarity": "rare",
+  "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+  "artist": "Matt Cavotta",
+  "artist_ids": [
+    "2e6a0611-9411-4ba4-98e3-c0e18cbf9f83"
+  ],
+  "illustration_id": "99cab97a-9861-4a5a-8578-6c742d192183",
+  "border_color": "black",
+  "frame": "2003",
+  "full_art": false,
+  "textless": false,
+  "booster": true,
+  "story_spotlight": false,
+  "penny_rank": 3742,
+  "prices": {
+    "usd": "23.57",
+    "usd_foil": "168.50",
+    "usd_etched": null,
+    "eur": "10.37",
+    "eur_foil": "52.35",
+    "tix": "0.02"
+  },
+  "related_uris": {
+    "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=87599&printed=false",
+    "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DErayo%252C%2BSoratami%2BAscendant%2B%252F%252F%2BErayo%2527s%2BEssence",
+    "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DErayo%252C%2BSoratami%2BAscendant%2B%252F%252F%2BErayo%2527s%2BEssence",
+    "edhrec": "https://edhrec.com/route/?cc=Erayo%2C+Soratami+Ascendant"
+  },
+  "purchase_uris": {
+    "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F12430%3Fpage%3D1",
+    "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=12658&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+    "cardhoarder": "https://www.cardhoarder.com/cards/22176?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+  }
+}
+
+Double-faced cards (Comp. rules term)
+These cards have two faces on different sides of the cardstock that are related to each other. The whole card is a single legal or deckbuilding object. Double-faced cards can either be transforming or modal.
+
+Transforming double-faced cards (Comp. rules term) · Example transforming DFCs
+These cards can either transform after entering the battlefield, or can be put onto the battlefield already transformed. Scryfall will use the card_faces object to describe the two different transformed modes of the card, while the root object will contain data that applies to both sides. These cards have their layout field set to "transform".
+GET https://api.scryfall.com/cards/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "card",
+  "id": "b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02",
+  "oracle_id": "6bb7d0df-7a9f-4e17-8c31-7628c4b12356",
+  "multiverse_ids": [
+    410007,
+    410008
+  ],
+  "mtgo_id": 59762,
+  "mtgo_foil_id": 59763,
+  "tcgplayer_id": 115432,
+  "cardmarket_id": 288952,
+  "name": "Arlinn Kord // Arlinn, Embraced by the Moon",
+  "lang": "en",
+  "released_at": "2016-04-08",
+  "uri": "https://api.scryfall.com/cards/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02",
+  "scryfall_uri": "https://scryfall.com/card/soi/243/arlinn-kord-arlinn-embraced-by-the-moon?utm_source=api",
+  "layout": "transform",
+  "highres_image": true,
+  "image_status": "highres_scan",
+  "image_updated_at": "2026-07-13T10:15:19Z",
+  "cmc": 4,
+  "type_line": "Legendary Planeswalker — Arlinn // Legendary Planeswalker — Arlinn",
+  "color_identity": [
+    "G",
+    "R"
+  ],
+  "keywords": [
+    "Transform"
+  ],
+  "card_faces": [
+    {
+      "object": "card_face",
+      "name": "Arlinn Kord",
+      "mana_cost": "{2}{R}{G}",
+      "type_line": "Legendary Planeswalker — Arlinn",
+      "oracle_text": "+1: Until end of turn, up to one target creature gets +2/+2 and gains vigilance and haste.\n0: Create a 2/2 green Wolf creature token. Transform Arlinn Kord.",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "loyalty": "3",
+      "artist": "Winona Nelson",
+      "artist_id": "e45fe8d3-75d6-42c9-a2df-e945ad81ea27",
+      "illustration_id": "b943b0d6-5e7b-46da-92df-00fd6cf173e0",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "normal": "https://cards.scryfall.io/normal/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "large": "https://cards.scryfall.io/large/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "png": "https://cards.scryfall.io/png/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.png?1783937719",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "thumb": "https://cards.scryfall.io/thumb/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "grid": "https://cards.scryfall.io/grid/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "display": "https://cards.scryfall.io/display/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "art": "https://cards.scryfall.io/art/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "crop": "https://cards.scryfall.io/crop/front/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719"
+      }
+    },
+    {
+      "object": "card_face",
+      "name": "Arlinn, Embraced by the Moon",
+      "mana_cost": "",
+      "type_line": "Legendary Planeswalker — Arlinn",
+      "oracle_text": "+1: Creatures you control get +1/+1 and gain trample until end of turn.\n−1: Arlinn deals 3 damage to any target. Transform Arlinn.\n−6: You get an emblem with \"Creatures you control have haste and '{T}: This creature deals damage equal to its power to any target.'\"",
+      "colors": [
+        "G",
+        "R"
+      ],
+      "color_indicator": [
+        "G",
+        "R"
+      ],
+      "artist": "Winona Nelson",
+      "artist_id": "e45fe8d3-75d6-42c9-a2df-e945ad81ea27",
+      "illustration_id": "025bdbd1-cb24-46b5-b19c-8bee24c3f3c0",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "normal": "https://cards.scryfall.io/normal/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "large": "https://cards.scryfall.io/large/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "png": "https://cards.scryfall.io/png/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.png?1783937719",
+        "art_crop": "https://cards.scryfall.io/art_crop/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "border_crop": "https://cards.scryfall.io/border_crop/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.jpg?1783937719",
+        "thumb": "https://cards.scryfall.io/thumb/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "grid": "https://cards.scryfall.io/grid/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "display": "https://cards.scryfall.io/display/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "art": "https://cards.scryfall.io/art/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719",
+        "crop": "https://cards.scryfall.io/crop/back/b/3/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02.webp?1783937719"
+      }
+    }
+  ],
+  "all_parts": [
+    {
+      "object": "related_card",
+      "id": "b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02",
+      "component": "combo_piece",
+      "name": "Arlinn Kord // Arlinn, Embraced by the Moon",
+      "type_line": "Legendary Planeswalker — Arlinn // Legendary Planeswalker — Arlinn",
+      "uri": "https://api.scryfall.com/cards/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02"
+    },
+    {
+      "object": "related_card",
+      "id": "bb0686c3-a44a-449d-ab12-eeb9c0c25489",
+      "component": "combo_piece",
+      "name": "Arlinn, Embraced by the Moon Emblem",
+      "type_line": "Emblem — Arlinn",
+      "uri": "https://api.scryfall.com/cards/bb0686c3-a44a-449d-ab12-eeb9c0c25489"
+    },
+    {
+      "object": "related_card",
+      "id": "0a5ac360-dc47-4bc5-a4cc-ff223abc3ffc",
+      "component": "token",
+      "name": "Wolf",
+      "type_line": "Token Creature — Wolf",
+      "uri": "https://api.scryfall.com/cards/0a5ac360-dc47-4bc5-a4cc-ff223abc3ffc"
+    },
+    {
+      "object": "related_card",
+      "id": "4825c59d-9e27-4a12-ba84-642b8540e573",
+      "component": "combo_piece",
+      "name": "Shadows Over Innistrad Checklist 2",
+      "type_line": "Card",
+      "uri": "https://api.scryfall.com/cards/4825c59d-9e27-4a12-ba84-642b8540e573"
+    }
+  ],
+  "legalities": {
+    "standard": "not_legal",
+    "future": "not_legal",
+    "historic": "legal",
+    "timeless": "legal",
+    "gladiator": "legal",
+    "pioneer": "legal",
+    "modern": "legal",
+    "legacy": "legal",
+    "pauper": "not_legal",
+    "vintage": "legal",
+    "penny": "legal",
+    "commander": "legal",
+    "oathbreaker": "legal",
+    "standardbrawl": "not_legal",
+    "brawl": "legal",
+    "competitivebrawl": "legal",
+    "alchemy": "not_legal",
+    "paupercommander": "not_legal",
+    "duel": "legal",
+    "oldschool": "not_legal",
+    "premodern": "not_legal",
+    "predh": "not_legal",
+    "tlr": "not_legal"
+  },
+  "games": [
+    "paper",
+    "mtgo"
+  ],
+  "reserved": false,
+  "game_changer": false,
+  "foil": true,
+  "nonfoil": true,
+  "finishes": [
+    "nonfoil",
+    "foil"
+  ],
+  "oversized": false,
+  "promo": false,
+  "reprint": false,
+  "variation": false,
+  "set_id": "5e914d7e-c1e9-446c-a33d-d093c02b2743",
+  "set": "soi",
+  "set_name": "Shadows over Innistrad",
+  "set_type": "expansion",
+  "set_uri": "https://api.scryfall.com/sets/5e914d7e-c1e9-446c-a33d-d093c02b2743",
+  "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Asoi&unique=prints",
+  "scryfall_set_uri": "https://scryfall.com/sets/soi?utm_source=api",
+  "rulings_uri": "https://api.scryfall.com/cards/b37aa12c-a6b3-4cf8-b5a4-0a999ff12d02/rulings",
+  "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A6bb7d0df-7a9f-4e17-8c31-7628c4b12356&unique=prints",
+  "collector_number": "243",
+  "digital": false,
+  "rarity": "mythic",
+  "artist": "Winona Nelson",
+  "artist_ids": [
+    "e45fe8d3-75d6-42c9-a2df-e945ad81ea27"
+  ],
+  "border_color": "black",
+  "frame": "2015",
+  "frame_effects": [
+    "sunmoondfc"
+  ],
+  "security_stamp": "oval",
+  "full_art": false,
+  "textless": false,
+  "booster": true,
+  "story_spotlight": false,
+  "edhrec_rank": 8378,
+  "penny_rank": 3766,
+  "prices": {
+    "usd": "1.48",
+    "usd_foil": "3.37",
+    "usd_etched": null,
+    "eur": "0.94",
+    "eur_foil": "2.17",
+    "tix": "0.02"
+  },
+  "related_uris": {
+    "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=410007&printed=false",
+    "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DArlinn%2BKord%2B%252F%252F%2BArlinn%252C%2BEmbraced%2Bby%2Bthe%2BMoon",
+    "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DArlinn%2BKord%2B%252F%252F%2BArlinn%252C%2BEmbraced%2Bby%2Bthe%2BMoon",
+    "edhrec": "https://edhrec.com/route/?cc=Arlinn+Kord"
+  },
+  "purchase_uris": {
+    "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F115432%3Fpage%3D1",
+    "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=288952&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+    "cardhoarder": "https://www.cardhoarder.com/cards/59762?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+  }
+}
+
+Modal double-faced cards (Comp. rules term) · Example modal DFCs
+Modal DFCs be cast or played as either half of the card. Scryfall will use the card_faces object to describe the two different modes of the card, while the root object will contain data that applies to both sides (such as the color_identity). These cards have their layout field set to "modal_dfc".
+GET https://api.scryfall.com/cards/ba09360a-067e-48a5-bdc5-a19fd066a785
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "card",
+  "id": "ba09360a-067e-48a5-bdc5-a19fd066a785",
+  "oracle_id": "0b299983-9f0f-404a-acd1-8f142572b1f1",
+  "multiverse_ids": [
+    516912,
+    516913
+  ],
+  "mtgo_id": 88779,
+  "arena_id": 76544,
+  "tcgplayer_id": 235673,
+  "cardmarket_id": 557492,
+  "name": "Extus, Oriq Overlord // Awaken the Blood Avatar",
+  "lang": "en",
+  "released_at": "2021-04-23",
+  "uri": "https://api.scryfall.com/cards/ba09360a-067e-48a5-bdc5-a19fd066a785",
+  "scryfall_uri": "https://scryfall.com/card/stx/149/extus-oriq-overlord-awaken-the-blood-avatar?utm_source=api",
+  "layout": "modal_dfc",
+  "highres_image": true,
+  "image_status": "highres_scan",
+  "image_updated_at": "2026-07-13T07:22:17Z",
+  "cmc": 4,
+  "type_line": "Legendary Creature — Human Warlock // Sorcery",
+  "color_identity": [
+    "B",
+    "R",
+    "W"
+  ],
+  "keywords": [
+    "Magecraft",
+    "Double strike"
+  ],
+  "card_faces": [
+    {
+      "object": "card_face",
+      "name": "Extus, Oriq Overlord",
+      "mana_cost": "{1}{W}{B}{B}",
+      "type_line": "Legendary Creature — Human Warlock",
+      "oracle_text": "Double strike\nMagecraft — Whenever you cast or copy an instant or sorcery spell, return target nonlegendary creature card from your graveyard to your hand.",
+      "colors": [
+        "B",
+        "W"
+      ],
+      "power": "2",
+      "toughness": "4",
+      "flavor_text": "\"Join me for the dawn of a new age.\"",
+      "artist": "Chase Stone",
+      "artist_id": "2d753f61-5f5b-468e-97ea-8e0fdd347340",
+      "illustration_id": "d4a80d40-02ec-4d4e-bbe5-2fb58bbb4a88",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "normal": "https://cards.scryfall.io/normal/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "large": "https://cards.scryfall.io/large/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "png": "https://cards.scryfall.io/png/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.png?1783927337",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "thumb": "https://cards.scryfall.io/thumb/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "grid": "https://cards.scryfall.io/grid/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "display": "https://cards.scryfall.io/display/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "art": "https://cards.scryfall.io/art/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "crop": "https://cards.scryfall.io/crop/front/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337"
+      }
+    },
+    {
+      "object": "card_face",
+      "name": "Awaken the Blood Avatar",
+      "mana_cost": "{6}{B}{R}",
+      "type_line": "Sorcery",
+      "oracle_text": "As an additional cost to cast this spell, you may sacrifice any number of creatures. This spell costs {2} less to cast for each creature sacrificed this way.\nEach opponent sacrifices a creature of their choice. Create a 3/6 black and red Avatar creature token with haste and \"Whenever this token attacks, it deals 3 damage to each opponent.\"",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "artist": "Kekai Kotaki",
+      "artist_id": "4b771085-c049-4308-930d-ec9665f803a4",
+      "illustration_id": "ed8629b5-b79b-4b2a-a3dd-e230f0b8b3ea",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "normal": "https://cards.scryfall.io/normal/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "large": "https://cards.scryfall.io/large/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "png": "https://cards.scryfall.io/png/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.png?1783927337",
+        "art_crop": "https://cards.scryfall.io/art_crop/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "border_crop": "https://cards.scryfall.io/border_crop/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.jpg?1783927337",
+        "thumb": "https://cards.scryfall.io/thumb/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "grid": "https://cards.scryfall.io/grid/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "display": "https://cards.scryfall.io/display/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "art": "https://cards.scryfall.io/art/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337",
+        "crop": "https://cards.scryfall.io/crop/back/b/a/ba09360a-067e-48a5-bdc5-a19fd066a785.webp?1783927337"
+      }
+    }
+  ],
+  "all_parts": [
+    {
+      "object": "related_card",
+      "id": "786156ce-544c-4aa4-8381-756042d0bcda",
+      "component": "combo_piece",
+      "name": "Extus, Oriq Overlord // Awaken the Blood Avatar",
+      "type_line": "Legendary Creature — Human Warlock // Sorcery",
+      "uri": "https://api.scryfall.com/cards/786156ce-544c-4aa4-8381-756042d0bcda"
+    },
+    {
+      "object": "related_card",
+      "id": "94a50acd-ac2d-47bf-b331-0bcf5edd9c75",
+      "component": "token",
+      "name": "Avatar",
+      "type_line": "Token Creature — Avatar",
+      "uri": "https://api.scryfall.com/cards/94a50acd-ac2d-47bf-b331-0bcf5edd9c75"
+    }
+  ],
+  "legalities": {
+    "standard": "not_legal",
+    "future": "not_legal",
+    "historic": "legal",
+    "timeless": "legal",
+    "gladiator": "legal",
+    "pioneer": "legal",
+    "modern": "legal",
+    "legacy": "legal",
+    "pauper": "not_legal",
+    "vintage": "legal",
+    "penny": "legal",
+    "commander": "legal",
+    "oathbreaker": "legal",
+    "standardbrawl": "not_legal",
+    "brawl": "legal",
+    "competitivebrawl": "legal",
+    "alchemy": "not_legal",
+    "paupercommander": "not_legal",
+    "duel": "legal",
+    "oldschool": "not_legal",
+    "premodern": "not_legal",
+    "predh": "not_legal",
+    "tlr": "not_legal"
+  },
+  "games": [
+    "arena",
+    "paper",
+    "mtgo"
+  ],
+  "reserved": false,
+  "game_changer": false,
+  "foil": true,
+  "nonfoil": true,
+  "finishes": [
+    "nonfoil",
+    "foil"
+  ],
+  "oversized": false,
+  "promo": false,
+  "reprint": false,
+  "variation": false,
+  "set_id": "541c3c28-8747-40e5-a231-8e8f33234859",
+  "set": "stx",
+  "set_name": "Strixhaven: School of Mages",
+  "set_type": "expansion",
+  "set_uri": "https://api.scryfall.com/sets/541c3c28-8747-40e5-a231-8e8f33234859",
+  "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Astx&unique=prints",
+  "scryfall_set_uri": "https://scryfall.com/sets/stx?utm_source=api",
+  "rulings_uri": "https://api.scryfall.com/cards/ba09360a-067e-48a5-bdc5-a19fd066a785/rulings",
+  "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A0b299983-9f0f-404a-acd1-8f142572b1f1&unique=prints",
+  "collector_number": "149",
+  "digital": false,
+  "rarity": "mythic",
+  "artist": "Chase Stone & Kekai Kotaki",
+  "artist_ids": [
+    "2d753f61-5f5b-468e-97ea-8e0fdd347340",
+    "4b771085-c049-4308-930d-ec9665f803a4"
+  ],
+  "border_color": "black",
+  "frame": "2015",
+  "frame_effects": [
+    "legendary"
+  ],
+  "security_stamp": "oval",
+  "full_art": false,
+  "textless": false,
+  "booster": true,
+  "story_spotlight": true,
+  "edhrec_rank": 11669,
+  "penny_rank": 9568,
+  "preview": {
+    "source": "PowrDragn",
+    "source_uri": "https://twitter.com/powrdragn/status/1376927296758509568",
+    "previewed_at": "2021-03-30"
+  },
+  "prices": {
+    "usd": "0.59",
+    "usd_foil": "2.40",
+    "usd_etched": null,
+    "eur": "0.82",
+    "eur_foil": "1.64",
+    "tix": "0.02"
+  },
+  "related_uris": {
+    "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=516912&printed=false",
+    "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DExtus%252C%2BOriq%2BOverlord%2B%252F%252F%2BAwaken%2Bthe%2BBlood%2BAvatar",
+    "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DExtus%252C%2BOriq%2BOverlord%2B%252F%252F%2BAwaken%2Bthe%2BBlood%2BAvatar",
+    "edhrec": "https://edhrec.com/route/?cc=Extus%2C+Oriq+Overlord"
+  },
+  "purchase_uris": {
+    "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F235673%3Fpage%3D1",
+    "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=557492&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+    "cardhoarder": "https://www.cardhoarder.com/cards/88779?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+  }
+}
+
+Reversible cards (casual term) · Example reversible cards
+This term is used by both Scryfall and WotC to describe a piece of cardstock with two distinct Magic cards or tokens printed on opposite sides. The two halves of the card are not related to each other in any way and are treated as two separate objects for gameplay or deckbuilding. The overall Card object will have its layout field set to "reversible_card", while the individual card_face objects will have their own layout fields describing the distinct printings on both sides. Many other fields for a reversible card move into the card_face objects to describe the distinct face.
+GET https://api.scryfall.com/cards/3e3f0bcd-0796-494d-bf51-94b33c1671e9
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "card",
+  "id": "3e3f0bcd-0796-494d-bf51-94b33c1671e9",
+  "multiverse_ids": [],
+  "tcgplayer_id": 259214,
+  "cardmarket_id": 657830,
+  "name": "Propaganda // Propaganda",
+  "lang": "en",
+  "released_at": "2022-04-22",
+  "uri": "https://api.scryfall.com/cards/3e3f0bcd-0796-494d-bf51-94b33c1671e9",
+  "scryfall_uri": "https://scryfall.com/card/sld/381/propaganda-propaganda?utm_source=api",
+  "layout": "reversible_card",
+  "highres_image": true,
+  "image_status": "highres_scan",
+  "image_updated_at": "2026-07-13T06:18:56Z",
+  "color_identity": [
+    "U"
+  ],
+  "keywords": [],
+  "card_faces": [
+    {
+      "object": "card_face",
+      "oracle_id": "ea9709b6-4c37-4d5a-b04d-cd4c42e4f9dd",
+      "layout": "normal",
+      "name": "Propaganda",
+      "mana_cost": "{2}{U}",
+      "cmc": 3,
+      "type_line": "Enchantment",
+      "oracle_text": "Creatures can't attack you unless their controller pays {2} for each creature they control that's attacking you.",
+      "colors": [
+        "U"
+      ],
+      "flavor_text": "\"Obedience is the true path to happiness.\"\n—Dolorus, magister equitum",
+      "artist": "Scott Balmer",
+      "artist_id": "c26dd9c9-54f9-4a8c-9d54-caac6be0161d",
+      "illustration_id": "7af368fa-6036-462a-a480-02ccc589bea5",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "normal": "https://cards.scryfall.io/normal/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "large": "https://cards.scryfall.io/large/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "png": "https://cards.scryfall.io/png/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.png?1783923536",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "thumb": "https://cards.scryfall.io/thumb/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "grid": "https://cards.scryfall.io/grid/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "display": "https://cards.scryfall.io/display/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "art": "https://cards.scryfall.io/art/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "crop": "https://cards.scryfall.io/crop/front/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536"
+      }
+    },
+    {
+      "object": "card_face",
+      "oracle_id": "ea9709b6-4c37-4d5a-b04d-cd4c42e4f9dd",
+      "layout": "normal",
+      "name": "Propaganda",
+      "mana_cost": "{2}{U}",
+      "cmc": 3,
+      "type_line": "Enchantment",
+      "oracle_text": "Creatures can't attack you unless their controller pays {2} for each creature they control that's attacking you.",
+      "colors": [
+        "U"
+      ],
+      "flavor_text": "\"Why rebel? The system can be changed from within.\"\n—Dolorus, magister equitum",
+      "artist": "Scott Balmer",
+      "artist_id": "c26dd9c9-54f9-4a8c-9d54-caac6be0161d",
+      "illustration_id": "fee742d4-3025-430f-9094-b67f249e54f5",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "normal": "https://cards.scryfall.io/normal/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "large": "https://cards.scryfall.io/large/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "png": "https://cards.scryfall.io/png/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.png?1783923536",
+        "art_crop": "https://cards.scryfall.io/art_crop/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "border_crop": "https://cards.scryfall.io/border_crop/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.jpg?1783923536",
+        "thumb": "https://cards.scryfall.io/thumb/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "grid": "https://cards.scryfall.io/grid/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "display": "https://cards.scryfall.io/display/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "art": "https://cards.scryfall.io/art/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536",
+        "crop": "https://cards.scryfall.io/crop/back/3/e/3e3f0bcd-0796-494d-bf51-94b33c1671e9.webp?1783923536"
+      }
+    }
+  ],
+  "legalities": {
+    "standard": "not_legal",
+    "future": "not_legal",
+    "historic": "not_legal",
+    "timeless": "not_legal",
+    "gladiator": "not_legal",
+    "pioneer": "not_legal",
+    "modern": "legal",
+    "legacy": "legal",
+    "pauper": "not_legal",
+    "vintage": "legal",
+    "penny": "not_legal",
+    "commander": "legal",
+    "oathbreaker": "legal",
+    "standardbrawl": "not_legal",
+    "brawl": "not_legal",
+    "competitivebrawl": "not_legal",
+    "alchemy": "not_legal",
+    "paupercommander": "not_legal",
+    "duel": "legal",
+    "oldschool": "not_legal",
+    "premodern": "legal",
+    "predh": "legal",
+    "tlr": "legal"
+  },
+  "games": [
+    "paper"
+  ],
+  "reserved": false,
+  "game_changer": false,
+  "foil": true,
+  "nonfoil": false,
+  "finishes": [
+    "foil"
+  ],
+  "oversized": false,
+  "promo": false,
+  "reprint": true,
+  "variation": false,
+  "set_id": "4d92a8a7-ccb0-437d-abdc-9d70fc5ed672",
+  "set": "sld",
+  "set_name": "Secret Lair Drop",
+  "set_type": "box",
+  "set_uri": "https://api.scryfall.com/sets/4d92a8a7-ccb0-437d-abdc-9d70fc5ed672",
+  "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Asld&unique=prints",
+  "scryfall_set_uri": "https://scryfall.com/sets/sld?utm_source=api",
+  "rulings_uri": "https://api.scryfall.com/cards/3e3f0bcd-0796-494d-bf51-94b33c1671e9/rulings",
+  "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3Aea9709b6-4c37-4d5a-b04d-cd4c42e4f9dd&unique=prints",
+  "collector_number": "381",
+  "digital": false,
+  "rarity": "rare",
+  "artist": "Scott Balmer",
+  "artist_ids": [
+    "c26dd9c9-54f9-4a8c-9d54-caac6be0161d"
+  ],
+  "border_color": "borderless",
+  "frame": "2015",
+  "frame_effects": [
+    "inverted"
+  ],
+  "security_stamp": "oval",
+  "full_art": false,
+  "textless": false,
+  "booster": false,
+  "story_spotlight": false,
+  "edhrec_rank": 114,
+  "prices": {
+    "usd": null,
+    "usd_foil": "45.09",
+    "usd_etched": null,
+    "eur": null,
+    "eur_foil": "43.74",
+    "tix": null
+  },
+  "related_uris": {
+    "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DPropaganda%2B%252F%252F%2BPropaganda",
+    "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DPropaganda%2B%252F%252F%2BPropaganda",
+    "edhrec": "https://edhrec.com/route/?cc=Propaganda+%2F%2F+Propaganda"
+  },
+  "purchase_uris": {
+    "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F259214%3Fpage%3D1",
+    "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=657830&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+    "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Propaganda+%2F%2F+Propaganda&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+  }
+}
+
+Multi-faced cards (casual term)
+This term has no rules meaning and is used by Scryfall to describe any object with the nested card_faces property.
+
+Double-sided cards (casual term)
+This term has no rules meaning and is used only casually to refer to any cards with gameplay information on both sides.

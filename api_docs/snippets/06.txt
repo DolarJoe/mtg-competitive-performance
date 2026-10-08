@@ -1,0 +1,470 @@
+GET /cards/search
+
+Rate limit: 2/second (500ms)
+
+Supported formats: json and csv
+
+Returns a List object containing Cards found using a fulltext search string. This string supports the same fulltext search system that the main site uses.
+
+This method is paginated, returning 175 cards at a time. Review the documentation for paginating the List type and and the Error type type to understand all of the possible output from this method.
+
+If only one card is found, this method will still return a List.
+Parameter 	Type 	Atn 	Details
+q 	String 		A fulltext search query. Make sure that your parameter is properly encoded. Maximum length: 1000 Unicode characters.
+unique 	String 	Optional 	The strategy for omitting similar cards. See below.
+order 	String 	Optional 	The method to sort returned cards. See below.
+dir 	String 	Optional 	The direction to sort cards. See below.
+include_extras 	Boolean 	Optional 	If true, extra cards (tokens, planes, etc) will be included. Equivalent to adding include:extras to the fulltext search. Defaults to false.
+include_multilingual 	Boolean 	Optional 	If true, cards in every language supported by Scryfall will be included. Defaults to false.
+include_variations 	Boolean 	Optional 	If true, rare care variants will be included, like the Hairy Runesword. Defaults to false.
+page 	Integer 	Optional 	The page number to return, default 1.
+format 	String 	Optional 	The data format to return: json or csv. Defaults to json.
+pretty 	Boolean 	Optional 	If true, the returned JSON will be prettified. Avoid using for production code.
+Unique (Rollup) Modes
+
+The unique parameter specifies if Scryfall should remove “duplicate” results in your query. The options are:
+Unique 	Default 	Description
+
+cards
+	
+
+✓
+	
+
+Removes duplicate gameplay objects (cards that share a name and have the same functionality). For example, if your search matches more than one print of Pacifism, only one copy of Pacifism will be returned.
+
+art
+		
+
+Returns only one copy of each unique artwork for matching cards. For example, if your search matches more than one print of Pacifism, one card with each different illustration for Pacifism will be returned, but any cards that duplicate artwork already in the results will be omitted.
+
+prints
+		
+
+Returns all prints for all cards matched (disables rollup). For example, if your search matches more than one print of Pacifism, all matching prints will be returned.
+Sorting Cards
+
+The order parameter determines how Scryfall should sort the returned cards.
+Order 	Default 	Description
+
+name
+	
+
+✓
+	
+
+Sort cards by name, A → Z
+
+set
+		
+
+Sort cards by their set and collector number: AAA/#1 → ZZZ/#999
+
+released
+		
+
+Sort cards by their release date: Newest → Oldest
+
+rarity
+		
+
+Sort cards by their rarity: Common → Mythic
+
+color
+		
+
+Sort cards by their color and color identity: WUBRG → multicolor → colorless
+
+usd
+		
+
+Sort cards by their lowest known U.S. Dollar price: 0.01 → highest, null last
+
+tix
+		
+
+Sort cards by their lowest known TIX price: 0.01 → highest, null last
+
+eur
+		
+
+Sort cards by their lowest known Euro price: 0.01 → highest, null last
+
+cmc
+		
+
+Sort cards by their mana value: 0 → highest
+
+power
+		
+
+Sort cards by their power: null → highest
+
+toughness
+		
+
+Sort cards by their toughness: null → highest
+
+edhrec
+		
+
+Sort cards by their EDHREC ranking: lowest → highest
+
+penny
+		
+
+Sort cards by their Penny Dreadful ranking: lowest → highest
+
+artist
+		
+
+Sort cards by their front-side artist name: A → Z
+
+review
+		
+
+Sort cards how podcasts review sets, usually color & CMC, lowest → highest, with Booster Fun cards at the end
+
+Then you can optionally specify a dir parameter to choose which direction the sorting should occur:
+Dir 	Default 	Description
+
+auto
+	
+
+✓
+	
+
+Scryfall will automatically choose the most inuitive direction to sort
+
+asc
+		
+
+Sort ascending (the direction of the arrows in the previous table)
+
+desc
+		
+
+Sort descending (flip the direction of the arrows in the previous table)
+Missing Luxuries
+
+Please note that this search endpoint is more strict than the user-facing search system on Scryfall. In particular:
+
+    On Scryfall’s website, if your search does not match any cards, the search system automatically retries with include:extras and again with lang:any. This API method does not automatically retry your search.
+    On Scryfall’s website, if your search is only for a set (example: e:set), the system automatically redirects you to the custom gallery page we have for that set (which uses unique:prints). This API method does not provide redirects.
+    On Scryfall’s website, certain searches trigger additional user interface elements that suggest expanding your search coverage (with o:changeling or unique:prints for example) or other searches may “swizzle” your results to show the cheapest prints when working with price search operators. This API method does not have this suggestion and swizzle behavior.
+    This API method will not provide help with spelling errors.
+
+Example Requests
+
+Find red creatures with 3 power, sorted by converted mana cost
+GET https://api.scryfall.com/cards/search?order=cmc&q=c%3Ared+pow%3D3
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "list",
+  "total_cards": 1005,
+  "has_more": true,
+  "next_page": "https://api.scryfall.com/cards/search?format=json&include_extras=false&include_multilingual=false&include_variations=false&order=cmc&page=2&q=c%3Ared+pow%3D3&unique=cards",
+  "data": [
+    {
+      "object": "card",
+      "id": "d99a9a7d-d9ca-4c11-80ab-e39d5943a315",
+      "oracle_id": "1f74e26f-5cf3-4b0e-bcc6-f858599474fc",
+      "multiverse_ids": [
+        522262
+      ],
+      "mtgo_id": 90749,
+      "tcgplayer_id": 239722,
+      "cardmarket_id": 566268,
+      "name": "Asmoranomardicadaistinaculdacar",
+      "lang": "en",
+      "released_at": "2021-06-18",
+      "uri": "https://api.scryfall.com/cards/d99a9a7d-d9ca-4c11-80ab-e39d5943a315",
+      "scryfall_uri": "https://scryfall.com/card/mh2/186/asmoranomardicadaistinaculdacar?utm_source=api",
+      "layout": "normal",
+      "highres_image": true,
+      "image_status": "highres_scan",
+      "image_updated_at": "2026-07-13T07:13:41Z",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1783926821",
+        "normal": "https://cards.scryfall.io/normal/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1783926821",
+        "large": "https://cards.scryfall.io/large/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1783926821",
+        "png": "https://cards.scryfall.io/png/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.png?1783926821",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1783926821",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.jpg?1783926821",
+        "thumb": "https://cards.scryfall.io/thumb/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.webp?1783926821",
+        "grid": "https://cards.scryfall.io/grid/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.webp?1783926821",
+        "display": "https://cards.scryfall.io/display/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.webp?1783926821",
+        "art": "https://cards.scryfall.io/art/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.webp?1783926821",
+        "crop": "https://cards.scryfall.io/crop/front/d/9/d99a9a7d-d9ca-4c11-80ab-e39d5943a315.webp?1783926821"
+      },
+      "mana_cost": "",
+      "cmc": 0,
+      "type_line": "Legendary Creature — Human Wizard",
+      "oracle_text": "As long as you've discarded a card this turn, you may pay {B/R} to cast this spell.\nWhen Asmoranomardicadaistinaculdacar enters, you may search your library for a card named The Underworld Cookbook, reveal it, put it into your hand, then shuffle.\nSacrifice two Foods: Target creature deals 6 damage to itself.",
+      "power": "3",
+      "toughness": "3",
+      "colors": [
+        "B",
+        "R"
+      ],
+      "color_indicator": [
+        "B",
+        "R"
+      ],
+      "color_identity": [
+        "B",
+        "R"
+      ],
+      "keywords": [],
+      "all_parts": [
+        {
+          "object": "related_card",
+          "id": "2879f780-e17f-4e68-931e-6e45f9df28e1",
+          "component": "combo_piece",
+          "name": "Asmoranomardicadaistinaculdacar",
+          "type_line": "Legendary Creature — Human Wizard",
+          "uri": "https://api.scryfall.com/cards/2879f780-e17f-4e68-931e-6e45f9df28e1"
+        },
+        {
+          "object": "related_card",
+          "id": "4f24504e-b397-4b98-b8e8-8166457f7a2e",
+          "component": "combo_piece",
+          "name": "The Underworld Cookbook",
+          "type_line": "Artifact — Book",
+          "uri": "https://api.scryfall.com/cards/4f24504e-b397-4b98-b8e8-8166457f7a2e"
+        }
+      ],
+      "legalities": {
+        "standard": "not_legal",
+        "future": "not_legal",
+        "historic": "not_legal",
+        "timeless": "not_legal",
+        "gladiator": "not_legal",
+        "pioneer": "not_legal",
+        "modern": "legal",
+        "legacy": "legal",
+        "pauper": "not_legal",
+        "vintage": "legal",
+        "penny": "legal",
+        "commander": "legal",
+        "oathbreaker": "legal",
+        "standardbrawl": "not_legal",
+        "brawl": "not_legal",
+        "competitivebrawl": "not_legal",
+        "alchemy": "not_legal",
+        "paupercommander": "not_legal",
+        "duel": "legal",
+        "oldschool": "not_legal",
+        "premodern": "not_legal",
+        "predh": "not_legal",
+        "tlr": "legal"
+      },
+      "games": [
+        "paper",
+        "mtgo"
+      ],
+      "reserved": false,
+      "game_changer": false,
+      "foil": true,
+      "nonfoil": true,
+      "finishes": [
+        "nonfoil",
+        "foil"
+      ],
+      "oversized": false,
+      "promo": false,
+      "reprint": false,
+      "variation": false,
+      "set_id": "c1c7eb8c-f205-40ab-a609-767cb296544e",
+      "set": "mh2",
+      "set_name": "Modern Horizons 2",
+      "set_type": "draft_innovation",
+      "set_uri": "https://api.scryfall.com/sets/c1c7eb8c-f205-40ab-a609-767cb296544e",
+      "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Amh2&unique=prints",
+      "scryfall_set_uri": "https://scryfall.com/sets/mh2?utm_source=api",
+      "rulings_uri": "https://api.scryfall.com/cards/d99a9a7d-d9ca-4c11-80ab-e39d5943a315/rulings",
+      "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A1f74e26f-5cf3-4b0e-bcc6-f858599474fc&unique=prints",
+      "collector_number": "186",
+      "digital": false,
+      "rarity": "rare",
+      "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+      "artist": "Ryan Pancoast",
+      "artist_ids": [
+        "89cc9475-dda2-4d13-bf88-54b92867a25c"
+      ],
+      "illustration_id": "109aa8fc-4587-4092-9a51-da3a81099ae5",
+      "border_color": "black",
+      "frame": "2015",
+      "frame_effects": [
+        "legendary"
+      ],
+      "security_stamp": "oval",
+      "full_art": false,
+      "textless": false,
+      "booster": true,
+      "story_spotlight": false,
+      "edhrec_rank": 12438,
+      "penny_rank": 2149,
+      "preview": {
+        "source": "Wizards of the Coast",
+        "source_uri": "https://magic.wizards.com/en/articles/archive/card-preview/challenge-accepted-2021-05-26",
+        "previewed_at": "2021-05-26"
+      },
+      "prices": {
+        "usd": "0.33",
+        "usd_foil": "1.11",
+        "usd_etched": null,
+        "eur": "0.43",
+        "eur_foil": "0.84",
+        "tix": "0.02"
+      },
+      "related_uris": {
+        "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=522262&printed=false",
+        "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DAsmoranomardicadaistinaculdacar",
+        "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DAsmoranomardicadaistinaculdacar",
+        "edhrec": "https://edhrec.com/route/?cc=Asmoranomardicadaistinaculdacar"
+      },
+      "purchase_uris": {
+        "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F239722%3Fpage%3D1",
+        "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=566268&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+        "cardhoarder": "https://www.cardhoarder.com/cards/90749?affiliate_id=scryfall&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+      }
+    },
+    {
+      "object": "card",
+      "id": "c7e6915b-2077-45aa-93e7-29b5f14beb51",
+      "oracle_id": "7b3b5be0-8bec-43c9-bd61-39fd92e0d705",
+      "multiverse_ids": [
+        439473
+      ],
+      "tcgplayer_id": 153180,
+      "cardmarket_id": 313994,
+      "name": "Half-Orc, Half-",
+      "lang": "en",
+      "released_at": "2017-12-08",
+      "uri": "https://api.scryfall.com/cards/c7e6915b-2077-45aa-93e7-29b5f14beb51",
+      "scryfall_uri": "https://scryfall.com/card/ust/84/half-orc-half-?utm_source=api",
+      "layout": "augment",
+      "highres_image": true,
+      "image_status": "highres_scan",
+      "image_updated_at": "2026-07-13T09:37:00Z",
+      "image_uris": {
+        "small": "https://cards.scryfall.io/small/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.jpg?1783935420",
+        "normal": "https://cards.scryfall.io/normal/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.jpg?1783935420",
+        "large": "https://cards.scryfall.io/large/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.jpg?1783935420",
+        "png": "https://cards.scryfall.io/png/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.png?1783935420",
+        "art_crop": "https://cards.scryfall.io/art_crop/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.jpg?1783935420",
+        "border_crop": "https://cards.scryfall.io/border_crop/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.jpg?1783935420",
+        "thumb": "https://cards.scryfall.io/thumb/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.webp?1783935420",
+        "grid": "https://cards.scryfall.io/grid/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.webp?1783935420",
+        "display": "https://cards.scryfall.io/display/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.webp?1783935420",
+        "art": "https://cards.scryfall.io/art/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.webp?1783935420",
+        "crop": "https://cards.scryfall.io/crop/front/c/7/c7e6915b-2077-45aa-93e7-29b5f14beb51.webp?1783935420"
+      },
+      "mana_cost": "",
+      "cmc": 0,
+      "type_line": "Creature — Orc Warrior",
+      "oracle_text": "Trample\nAt the beginning of each end step, if an opponent was dealt damage this turn,\nAugment {1}{R}{R} ({1}{R}{R}, Reveal this card from your hand: Combine it with target host. Augment only as a sorcery.)",
+      "power": "+3",
+      "toughness": "+1",
+      "colors": [
+        "R"
+      ],
+      "color_indicator": [
+        "R"
+      ],
+      "color_identity": [
+        "R"
+      ],
+      "keywords": [
+        "Trample",
+        "Augment"
+      ],
+      "legalities": {
+        "standard": "not_legal",
+        "future": "not_legal",
+        "historic": "not_legal",
+        "timeless": "not_legal",
+        "gladiator": "not_legal",
+        "pioneer": "not_legal",
+        "modern": "not_legal",
+        "legacy": "not_legal",
+        "pauper": "not_legal",
+        "vintage": "not_legal",
+        "penny": "not_legal",
+        "commander": "not_legal",
+        "oathbreaker": "not_legal",
+        "standardbrawl": "not_legal",
+        "brawl": "not_legal",
+        "competitivebrawl": "not_legal",
+        "alchemy": "not_legal",
+        "paupercommander": "not_legal",
+        "duel": "not_legal",
+        "oldschool": "not_legal",
+        "premodern": "not_legal",
+        "predh": "not_legal",
+        "tlr": "not_legal"
+      },
+      "games": [
+        "paper"
+      ],
+      "reserved": false,
+      "game_changer": false,
+      "foil": true,
+      "nonfoil": true,
+      "finishes": [
+        "nonfoil",
+        "foil"
+      ],
+      "oversized": false,
+      "promo": false,
+      "reprint": false,
+      "variation": false,
+      "set_id": "83491685-880d-41dd-a4af-47d2b3b17c10",
+      "set": "ust",
+      "set_name": "Unstable",
+      "set_type": "funny",
+      "set_uri": "https://api.scryfall.com/sets/83491685-880d-41dd-a4af-47d2b3b17c10",
+      "set_search_uri": "https://api.scryfall.com/cards/search?order=set&q=e%3Aust&unique=prints",
+      "scryfall_set_uri": "https://scryfall.com/sets/ust?utm_source=api",
+      "rulings_uri": "https://api.scryfall.com/cards/c7e6915b-2077-45aa-93e7-29b5f14beb51/rulings",
+      "prints_search_uri": "https://api.scryfall.com/cards/search?order=released&q=oracleid%3A7b3b5be0-8bec-43c9-bd61-39fd92e0d705&unique=prints",
+      "collector_number": "84",
+      "digital": false,
+      "rarity": "uncommon",
+      "card_back_id": "0aeebaf5-8c7d-4636-9e82-8c27447861f7",
+      "artist": "Kev Walker",
+      "artist_ids": [
+        "f366a0ee-a0cd-466d-ba6a-90058c7a31a6"
+      ],
+      "illustration_id": "ed8bb73e-fba9-4e7f-9888-217c8b635fd6",
+      "border_color": "silver",
+      "frame": "2015",
+      "full_art": false,
+      "textless": false,
+      "booster": true,
+      "story_spotlight": false,
+      "prices": {
+        "usd": "0.15",
+        "usd_foil": "1.03",
+        "usd_etched": null,
+        "eur": "0.09",
+        "eur_foil": "0.42",
+        "tix": null
+      },
+      "related_uris": {
+        "gatherer": "https://gatherer.wizards.com/Pages/Card/Details.aspx?multiverseid=439473&printed=false",
+        "tcgplayer_infinite_articles": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Farticles&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Farticles%3FproductLineName%3Dmagic%26q%3DHalf-Orc%252C%2BHalf-",
+        "tcgplayer_infinite_decks": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&trafcat=tcgplayer.com%2Fsearch%2Fdecks&u=https%3A%2F%2Fwww.tcgplayer.com%2Fsearch%2Fdecks%3FproductLineName%3Dmagic%26q%3DHalf-Orc%252C%2BHalf-",
+        "edhrec": "https://edhrec.com/route/?cc=Half-Orc%2C+Half-"
+      },
+      "purchase_uris": {
+        "tcgplayer": "https://partner.tcgplayer.com/c/4931599/1830156/21018?subId1=api&u=https%3A%2F%2Fwww.tcgplayer.com%2Fproduct%2F153180%3Fpage%3D1",
+        "cardmarket": "https://www.cardmarket.com/en/Magic/Products?idProduct=313994&referrer=scryfall&utm_campaign=card_prices&utm_medium=text&utm_source=scryfall",
+        "cardhoarder": "https://www.cardhoarder.com/cards?affiliate_id=scryfall&data%5Bsearch%5D=Half-Orc%2C+Half-&ref=card-profile&utm_campaign=affiliate&utm_medium=card&utm_source=scryfall"
+      }
+    },
+    NOTE TO AGENT more cards were below, as in the list continued

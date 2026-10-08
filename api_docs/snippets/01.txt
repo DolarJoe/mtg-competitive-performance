@@ -1,0 +1,44 @@
+
+API Documentation
+
+Scryfall provides a REST-like API for ingesting our card data programmatically. The API exposes information available on the regular site in easy-to-consume formats.
+Endpoint Details
+
+The API is available at https://api.scryfall.com
+
+API requests are only served over HTTPS, using TLS 1.2 or better. Requests will not be honored over plaintext HTTP.
+
+The API uses UTF-8 character encoding for all responses. Many fields will include characters that are not in the ASCII range.
+
+Endpoints (especially for card data) have specific hard rate limits.
+Required Headers
+
+All HTTP requests to api.scryfall.com must include a User-Agent header and an Accept header.
+
+Your User-Agent header must be accurate to your usage context. If you are running a script or app, the header should be the name of your application, such as MTGExampleApp/1.0 or the current relevant version. Do not allow HTTP libraries to choose the header for you.
+
+If you are accessing the API via on-page web browser JavaScript, keep the browser’s User-Agent intact.
+
+The Accept header must be present, but you can provide a generic preference. For example, both of these are okay: Accept: */* and Accept: application/json;q=0.9,*/*;q=0.8.
+Use of Scryfall Data and Images
+
+As part of the Wizards of the Coast Fan Content Policy, Scryfall provides our card data and image database free of charge for the primary purpose of creating additional Magic software, performing research, or creating community content (such as videos, streams, podcasts, etc.) about Magic and related products.
+
+When using Scryfall data, you must adhere to the following guidelines:
+
+    You may not use Scryfall logos or use the Scryfall name in a way that implies Scryfall has endorsed you, your work, or your product.
+    You may not “paywall” access to Scryfall data. You may not require anyone to make payments, take surveys, agree to subscriptions, rate your content, join chat servers, or follow channels in exchange for access to Scryfall data. If you have an account system, end-users should be able to access card data anonymously or with free accounts.
+    You may not use Scryfall data to create new games, or to imply the information and images are from any other game besides Magic: The Gathering.
+    You may not simply repackage, republish, or proxy Scryfall data. Your software must create additional value for end-users.
+
+When using images from Scryfall, you must adhere to the following guidelines:
+
+    Do not cover, crop, or clip off the copyright or artist name on card images.
+    Do not distort, skew, or stretch card images.
+    Do not blur, sharpen, desaturate, or color-shift card images.
+    Do not add your own watermarks, stamps, or logos to card images.
+    Do not place card images in a way that implies someone other than Wizards of the Coast created the card or that it is from another game besides Magic: The Gathering.
+    When using the art_crop, list the artist name and copyright elsewhere in the same interface presenting the art crop, or use the full card image elsewhere in the same interface. Users should be able to identify the artist and source of the image somehow.
+
+Repeated mishandling or misrepresentation of data or images in your project may result in Scryfall restricting or blocking your API access.
+

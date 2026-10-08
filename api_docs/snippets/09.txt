@@ -1,0 +1,28 @@
+GET /bulk-data/:id
+
+Supported formats: json, file
+
+Returns a single Bulk Data object with the given id.
+Parameter 	Type 	Atn 	Details
+:id 	UUID 		The id of the Bulk Data object.
+format 	String 	Optional 	The data format to return: json or file. Defaults to json.
+pretty 	Boolean 	Optional 	If true, the returned JSON will be prettified. Avoid using for production code.
+Example Requests
+
+Fetch the “All Cards” bulk data
+GET https://api.scryfall.com/bulk-data/922288cb-4bef-45e1-bb30-0c2bd3d3534f
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "bulk_data",
+  "id": "922288cb-4bef-45e1-bb30-0c2bd3d3534f",
+  "type": "all_cards",
+  "updated_at": "2026-09-16T21:18:08.763+00:00",
+  "uri": "https://api.scryfall.com/bulk-data/922288cb-4bef-45e1-bb30-0c2bd3d3534f",
+  "name": "All Cards",
+  "description": "A JSON file containing every card object on Scryfall in every language.",
+  "jsonl_download_uri": "https://data.scryfall.io/all-cards/all-cards-20260916211808.jsonl.gz",
+  "compressed_size": 392979256
+}

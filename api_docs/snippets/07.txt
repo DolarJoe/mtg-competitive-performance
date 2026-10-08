@@ -1,0 +1,64 @@
+Catalog Objects
+
+A Catalog object contains an array of Magic datapoints (words, card values, etc). Catalog objects are provided by the API as aids for building other Magic software and understanding possible values for a field on Card objects.
+Property 	Type 	Atn 	Details
+object 	String 		A content type for this object, always catalog.
+uri 	URI 		A link to the current catalog on Scryfall’s API.
+total_values 	Integer 		The number of items in the data array.
+data 	Array 		An array of datapoints, as strings.
+Example Request
+
+Retrieve the catalog of land types.
+GET https://api.scryfall.com/catalog/land-types
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "catalog",
+  "uri": "https://api.scryfall.com/catalog/land-types",
+  "total_values": 18,
+  "data": [
+    "Cave",
+    "Cloud",
+    "Desert",
+    "Forest",
+    "Gate",
+    "Island",
+    "Lair",
+    "Locus",
+    "Mine",
+    "Mountain",
+    "Sphere",
+    "Plains",
+    "Planet",
+    "Power-Plant",
+    "Swamp",
+    "Tower",
+    "Town",
+    "Urza's"
+  ]
+}
+
+Below are provided the available calogues
+
+/catalog/card-names
+/catalog/artist-names
+/catalog/word-bank
+/catalog/supertypes
+/catalog/card-types
+/catalog/artifact-types
+/catalog/battle-types
+/catalog/creature-types
+/catalog/enchantment-types
+/catalog/land-types
+/catalog/planeswalker-types
+/catalog/spell-types
+/catalog/powers
+/catalog/toughnesses
+/catalog/loyalties
+/catalog/keyword-abilities
+/catalog/keyword-actions
+/catalog/ability-words
+/catalog/flavor-words
+/catalog/watermarks

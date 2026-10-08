@@ -1,0 +1,137 @@
+Bulk Data Files
+
+Scryfall provides daily exports of our card data in bulk files. Each of these files is represented as a bulk_data object via the API. URLs for files change their timestamp each day, and can be fetched programmatically.
+
+Each bulk file is a gzipped JSONL (JSON Lines) archive:
+
+    You will specifically download a jsonl.gz archive and need to decompress or stream it on disk. They are not wrapped in tarballs (it’s just .gz, not .tar.gz)
+    Many programing languages offer a way to stream JSONL directly from the gzip archive without having to decompress the entire file at once or load the entire file into system memory. For example, Ruby has Zlib::GzipReader#each_line
+    On POSIX systems you can use gunzip from the shell
+
+Please note:
+
+    Card objects in bulk data include price information, but prices should be considered dangerously stale after 24 hours. Only use bulk price information to track trends or provide a general estimate of card value. Prices are not updated frequently enough to power a storefront or sales system. You consume price information at your own risk.
+    Updates to gameplay data (such as card names, Oracle text, mana costs, etc) are much less frequent. If you only need gameplay information, downloading card data once per week or right after set releases would most likely be sufficient.
+    Every card type in every product is included, including double-faced cards, planar cards, schemes, vanguards, tokens, and funny cards. Make sure you’ve reviewed documentation for the Card type.
+    The Art Tags and Oracle Tags files contain community-maintained tag data from the Tagger project. See the Tags documentation for the object format and guidance on joining tags to cards.
+
+Bulk data is only collected once every 12-24 hours. You can use the card API methods to retrieve fresh objects instead. You can also use the /cards/manifest method to check for anything that has changed on Scryfall.
+Files
+File 	Link 	Compressed Size 	Last Updated
+Oracle Cards 	Download 	23.5 MB 	2026-09-16 21:01 UTC
+A JSON file containing one Scryfall card object for each Oracle ID on Scryfall. The chosen sets for the cards are an attempt to return the most up-to-date recognizable version of the card.
+Unique Artwork 	Download 	36.1 MB 	2026-09-16 21:02 UTC
+A JSON file of Scryfall card objects that together contain all unique artworks. The chosen cards promote the best image scans.
+Default Cards 	Download 	74.7 MB 	2026-09-16 21:05 UTC
+A JSON file containing every card object on Scryfall in English or the printed language if the card is only available in one language.
+All Cards 	Download 	375 MB 	2026-09-16 21:18 UTC
+A JSON file containing every card object on Scryfall in every language.
+Rulings 	Download 	5.12 MB 	2026-09-16 21:00 UTC
+A JSON file containing all Rulings on Scryfall. Each ruling refers to cards via an `oracle_id`.
+Art Tags 	Download 	12.2 MB 	2026-09-16 21:01 UTC
+A JSON file containing all art (illustration) tags sourced from Tagger, the Scryfall community tagging project.
+Oracle Tags 	Download 	5.71 MB 	2026-09-16 21:00 UTC
+A JSON file containing all Oracle tags sourced from Tagger, the Scryfall community tagging project.
+Fields
+
+Bulk data objects have the following properties:
+Property 	Type 	Atn 	Details
+id 	UUID 		A unique ID for this bulk item.
+uri 	URI 		The Scryfall API URI for this file.
+type 	String 		A computer-readable string for the kind of bulk item.
+name 	String 		A human-readable name for this file.
+description 	String 		A human-readable description for this file.
+updated_at 	Timestamp 		The time when this file was last updated.
+jsonl_download_uri 	URI 		The URI that hosts this bulk as jsonl.gz for fetching.
+compressed_size 	Integer 		The size of the compressed jsonl.gz file in integer bytes.
+Example Request
+
+Retrieve all bulk data items:
+GET https://api.scryfall.com/bulk-data
+
+HTTP 200 success
+Content-Type: application/json; charset=utf-8
+
+{
+  "object": "list",
+  "has_more": false,
+  "data": [
+    {
+      "object": "bulk_data",
+      "id": "27bf3214-1271-490b-bdfe-c0be6c23d02e",
+      "type": "oracle_cards",
+      "updated_at": "2026-09-16T21:01:59.845+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/27bf3214-1271-490b-bdfe-c0be6c23d02e",
+      "name": "Oracle Cards",
+      "description": "A JSON file containing one Scryfall card object for each Oracle ID on Scryfall. The chosen sets for the cards are an attempt to return the most up-to-date recognizable version of the card.",
+      "jsonl_download_uri": "https://data.scryfall.io/oracle-cards/oracle-cards-20260916210159.jsonl.gz",
+      "compressed_size": 24674088
+    },
+    {
+      "object": "bulk_data",
+      "id": "6bbcf976-6369-4401-88fc-3a9e4984c305",
+      "type": "unique_artwork",
+      "updated_at": "2026-09-16T21:02:28.867+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/6bbcf976-6369-4401-88fc-3a9e4984c305",
+      "name": "Unique Artwork",
+      "description": "A JSON file of Scryfall card objects that together contain all unique artworks. The chosen cards promote the best image scans.",
+      "jsonl_download_uri": "https://data.scryfall.io/unique-artwork/unique-artwork-20260916210228.jsonl.gz",
+      "compressed_size": 37905731
+    },
+    {
+      "object": "bulk_data",
+      "id": "e2ef41e3-5778-4bc2-af3f-78eca4dd9c23",
+      "type": "default_cards",
+      "updated_at": "2026-09-16T21:05:54.709+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/e2ef41e3-5778-4bc2-af3f-78eca4dd9c23",
+      "name": "Default Cards",
+      "description": "A JSON file containing every card object on Scryfall in English or the printed language if the card is only available in one language.",
+      "jsonl_download_uri": "https://data.scryfall.io/default-cards/default-cards-20260916210554.jsonl.gz",
+      "compressed_size": 78347979
+    },
+    {
+      "object": "bulk_data",
+      "id": "922288cb-4bef-45e1-bb30-0c2bd3d3534f",
+      "type": "all_cards",
+      "updated_at": "2026-09-16T21:18:08.763+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/922288cb-4bef-45e1-bb30-0c2bd3d3534f",
+      "name": "All Cards",
+      "description": "A JSON file containing every card object on Scryfall in every language.",
+      "jsonl_download_uri": "https://data.scryfall.io/all-cards/all-cards-20260916211808.jsonl.gz",
+      "compressed_size": 392979256
+    },
+    {
+      "object": "bulk_data",
+      "id": "06f54c0b-ab9c-452d-b35a-8297db5eb940",
+      "type": "rulings",
+      "updated_at": "2026-09-16T21:00:32.321+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/06f54c0b-ab9c-452d-b35a-8297db5eb940",
+      "name": "Rulings",
+      "description": "A JSON file containing all Rulings on Scryfall. Each ruling refers to cards via an `oracle_id`.",
+      "jsonl_download_uri": "https://data.scryfall.io/rulings/rulings-20260916210032.jsonl.gz",
+      "compressed_size": 5366171
+    },
+    {
+      "object": "bulk_data",
+      "id": "48da5752-eeb6-4126-bf97-8829e20ad14f",
+      "type": "art_tags",
+      "updated_at": "2026-09-16T21:01:15.645+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/48da5752-eeb6-4126-bf97-8829e20ad14f",
+      "name": "Art Tags",
+      "description": "A JSON file containing all art (illustration) tags sourced from Tagger, the Scryfall community tagging project.",
+      "jsonl_download_uri": "https://data.scryfall.io/art-tags/art-tags-20260916210115.jsonl.gz",
+      "compressed_size": 12826593
+    },
+    {
+      "object": "bulk_data",
+      "id": "bd8df61e-5d0a-47a2-9086-40137a645b98",
+      "type": "oracle_tags",
+      "updated_at": "2026-09-16T21:00:32.577+00:00",
+      "uri": "https://api.scryfall.com/bulk-data/bd8df61e-5d0a-47a2-9086-40137a645b98",
+      "name": "Oracle Tags",
+      "description": "A JSON file containing all Oracle tags sourced from Tagger, the Scryfall community tagging project.",
+      "jsonl_download_uri": "https://data.scryfall.io/oracle-tags/oracle-tags-20260916210032.jsonl.gz",
+      "compressed_size": 5987783
+    }
+  ]
+}
