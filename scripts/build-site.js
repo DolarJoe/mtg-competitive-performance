@@ -209,7 +209,6 @@ const html = `<!DOCTYPE html>
           margin:0 auto; }
   @media (max-width:860px)  { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
   @media (max-width:640px)  { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-  @media (max-width:430px)  { .grid { grid-template-columns:repeat(1,minmax(0,1fr)); } }
 
   .tile { position:relative; display:flex; flex-direction:column; color:var(--fg);
           border:1px solid var(--line); border-radius:12px; background:#0e1013;
@@ -281,7 +280,7 @@ const SORTS = [['o','occurrences'],['d','decks'],['p','% decks'],['mq','main qty
 function el(id) { return document.getElementById(id); }
 
 el('meta').textContent = DATA.n + ' decklists from mtgtop8\u2019s \u201c' + DATA.label + '\u201d view \u00b7 '
-  + DATA.rows.length + ' distinct cards \u00b7 ' + DATA.per + ' per page \u00b7 scraped '
+  + DATA.rows.length + ' distinct cards \u00b7 ' + DATA.per + ' per page \u00b7 site built '
   + new Date(DATA.generated).toLocaleString() + ' \u00b7 ' + DATA.source;
 
 function value(c, k) {
