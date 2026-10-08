@@ -254,8 +254,6 @@ const html = `<!DOCTYPE html>
       <select id="sort-field" aria-label="Sort field">
         <option value="o">occurrences</option>
         <option value="d">decks</option>
-        <option value="mq">main qty</option>
-        <option value="sq">side qty</option>
         <option value="na">archetypes</option>
         <option value="n">name</option>
       </select>
@@ -274,7 +272,7 @@ const html = `<!DOCTYPE html>
 const DATA = ${payload};
 /* Default sort is the old table's: occurrences, descending. */
 let sortKey = 'o', sortDir = -1, section = 'main', hideBasics = true, query = '';
-const SORTS = [['o','occurrences'],['d','decks'],['mq','main qty'],['sq','side qty'],['na','archetypes'],['n','name']];
+const SORTS = [['o','occurrences'],['d','decks'],['na','archetypes'],['n','name']];
 
 function el(id) { return document.getElementById(id); }
 
