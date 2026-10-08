@@ -178,7 +178,7 @@ const html = `<!DOCTYPE html>
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--fg);
          font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
-  header { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+  header { background:var(--bg); border-bottom:1px solid var(--line);
            padding:14px 18px; z-index:2; }
   h1 { margin:0 0 4px; font-size:15px; letter-spacing:.04em; text-transform:uppercase; }
   h1 .win { color:var(--hi); text-transform:none; letter-spacing:0; }
